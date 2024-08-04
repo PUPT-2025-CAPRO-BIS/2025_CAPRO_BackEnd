@@ -6,7 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BarangayOfficialController;
 
-
+use App\Http\Controllers\DocumentController;
 
 
 /*
@@ -29,6 +29,7 @@ Route::middleware(['AuthUser:1-2-3'])->group(function () {
     Route::get('viewBarangayOfficials', [BarangayOfficialController::class, 'viewBarangayOfficials']);
 });
 Route::post('noVerificationRegistration', [UserController::class, 'noVerificationRegistration']);
+Route::post('testString', [DocumentController::class, 'testString']);
 Route::post('manualLogin', [UserController::class, 'manualLogin']);
 Route::post('adminLogin', [UserController::class, 'adminLogin']);
 Route::post('generateOTP', [UserController::class, 'generateOTP']);
@@ -43,6 +44,9 @@ Route::middleware(['AuthUser:3'])->group(function () {
     Route::get('viewPrivilegedUsers', [AdminController::class, 'viewPrivilegedUsers']);
 });
 Route::middleware(['AuthUser:2-3'])->group(function () {
+    Route::post('addDocumentType', [DocumentController::class, 'addDocumentType']);
+    Route::get('getDocumentTypes', [DocumentController::class, 'getDocumentTypes']);
+    Route::post('deleteDocumentType', [DocumentController::class, 'deleteDocumentType']);
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     //Route::get('viewAssignableToBarangayOfficial', [BarangayOfficialController::class, 'viewAssignableToBarangayOfficial']);
     Route::post('deleteBarangayOfficial', [BarangayOfficialController::class, 'deleteBarangayOfficial']);
