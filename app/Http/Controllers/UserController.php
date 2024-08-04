@@ -8,7 +8,7 @@ use App\Rules\isPhNumber;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\OTPEmail;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -181,6 +181,7 @@ class UserController extends Controller
         ct.civil_status_type,
         u.male_female,
         u.birthday,
+        u.cell_number,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,

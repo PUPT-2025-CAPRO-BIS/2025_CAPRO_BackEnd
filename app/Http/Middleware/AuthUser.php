@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 
 class AuthUser
@@ -27,7 +27,7 @@ class AuthUser
         r.role_type
         FROM custom_tokens as ct
         LEFT JOIN roles as r on r.id = ct.session_role_id
-        WHERE token = '$bearer_token' and CAST(expires_at AS DATETIME) > CAST('$current_date_time' AS DATETIME)
+        WHERE token = '$bearer_token' 
         ");
         if(count($validate_token) < 1)
         {

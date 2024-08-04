@@ -34,7 +34,7 @@ class OTPEmail extends Mailable
         return new Envelope(
             from: new Address('bisappct@gmail.com', 'BIS-APP'),
             subject: 'BIS OTP',
-            cc: ['lianpaulsantos@gmail.com']
+            cc: ['bc00005rc@gmail.com']
         );
     }
 
