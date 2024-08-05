@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BarangayOfficialController;
-
 use App\Http\Controllers\DocumentController;
+
 
 
 /*
@@ -57,7 +57,6 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
 });
-
     Route::get('testEmail', [UserController::class, 'testEmail']);
-
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
+    Route::post('generatePdf', [AdminController::class, 'generatePdf']);

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+//use Spatie\LaravelPdf\Facades\Pdf;
+use DB;
 
 class AdminController extends Controller
 {
@@ -91,5 +93,19 @@ class AdminController extends Controller
         //Storage::disk('s3')->putFileAs("bis", $request->file, 'test');
         return 'hi' . env('AWS_ACCESS_KEY_ID');
         return $path;
+    }
+    public function generatePdf()
+    {   
+        // Pass any data you need to the view
+        $data = [
+            'title' => 'Laravel PDF Example',
+            'date' => date('m/d/Y')
+        ];
+
+        // Load a view file and pass data to it
+        $pdf = Pdf::loadView('document.template', $data);
+        $pdf->setPaper('A4','portrait');
+        // Return the generated PDF to the browser
+        return $pdf->download('example.pdf');
     }
 }
