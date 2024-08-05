@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use DB;
 class BarangayOfficialController extends Controller
 {
     public function assignBarangayOfficial(Request $request)
@@ -58,17 +58,42 @@ class BarangayOfficialController extends Controller
             where bo.id IS NULL
         ");
     }*/
-    public function viewBarangayOfficials()
+    public function viewBarangayOfficials(Request $request)
     {
+        $item_per_page = "";
+        $item_per_page_limit ="";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%'";
+        }
         $barangay_officials = DB::select("SELECT
         u.id as user_id,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         bo.chairmanship,
         bo.position,
         bo.status
-        FROM users as u
-        LEFT JOIN barangay_officials as bo on bo.user_id = u.id
-        WHERE bo.id IS NOT NULL
+        FROM barangay_officials as bo
+        LEFT JOIN users as u on bo.user_id = u.id
+        $search_value
+        ORDER BY bo.id
+        $item_per_page_limit
+        $offset_value
         ");
         return response()->json($barangay_officials,200);
     }
