@@ -8,7 +8,7 @@ use App\Rules\isPhNumber;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\OTPEmail;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 class UserController extends Controller
 {
@@ -65,6 +65,11 @@ class UserController extends Controller
         FROM users as us
         where us.email = '$request->email'
         ");
+        if($request->file)
+        {
+            $path = Storage::disk('s3')->put('bis',$request->file('file_upload'));
+            return 'hi' . env('AWS_ACCESS_KEY_ID');
+        }
         return response()->json([
             'msg' => 'Account created',
             'success' => true
@@ -177,8 +182,25 @@ class UserController extends Controller
         ");
         return response()->json($user_details,200);
     }
-    public function viewAllUsers()
+    public function viewAllUsers(Request $request)
     {
+        $item_per_page = $request->item_per_page;
+        $page_number = $request->page_number;
+
+        $offset = $item_per_page * ($page_number - 1);
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%'";
+        }
+
         $users = DB::select("SELECT
         u.id,
         u.Email,
@@ -194,7 +216,14 @@ class UserController extends Controller
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
         CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
-        FROM users as u
+        FROM(
+        SELECT *
+        FROM users
+        $search_value
+        ORDER BY id
+        LIMIT $item_per_page
+        $offset_value
+        ) as u
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
