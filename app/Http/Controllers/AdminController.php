@@ -94,12 +94,32 @@ class AdminController extends Controller
         return 'hi' . env('AWS_ACCESS_KEY_ID');
         return $path;
     }
-    public function generatePdf()
+    public function generateFormatPdf()
     {   
         // Pass any data you need to the view
         $data = [
             'title' => 'Laravel PDF Example',
             'date' => date('m/d/Y')
+        ];
+
+        // Load a view file and pass data to it
+        $pdf = Pdf::loadView('document.template', $data);
+        $pdf->setPaper('A4','portrait');
+        // Return the generated PDF to the browser
+        return $pdf->download('example.pdf');
+    }
+    //generateFormatPdf
+    public function generatePdf(Request $request)
+    {   
+        // Pass any data you need to the view
+        $description = DB::select("SELECT
+        *
+        FROM document_types
+        WHERE id = '$request->doc_id'
+        ")[0]->description;
+        $data = [
+            'title' => 'Laravel PDF Example',
+            'html_code' => $description
         ];
 
         // Load a view file and pass data to it
