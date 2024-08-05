@@ -10,10 +10,16 @@ class DocumentController extends Controller
     {
         $service = $request->service;
         $description = $request->description;
+        $isCertificate = 1;
+        if($request->isCertificate)
+        {
+            $isCertificate = $request->isCertificate;
+        }
         DB::table('document_types')
             ->insert([
                 'service' => $service,
                 'description' => $description,
+                'isCertificate' => $isCertificate,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         /*

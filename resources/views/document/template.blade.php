@@ -415,7 +415,7 @@
 
 
             <div id='document-body' class='' style="height:520px">
-                {/* BODY */}
+                {!!$html_code!!}
             </div>
 
             <div class='flex-column d-flex align-items-end pe-5'>

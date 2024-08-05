@@ -56,7 +56,7 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
+    Route::post('generatePdf', [AdminController::class, 'generatePdf']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
-    Route::post('generatePdf', [AdminController::class, 'generatePdf']);
