@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 class BarangayOfficialController extends Controller
 {
     public function assignBarangayOfficial(Request $request)
@@ -22,13 +22,15 @@ class BarangayOfficialController extends Controller
         if(count($user_details) < 1)
         {
             return response()->json([
-                'error_msg' => 'User with specified id does not exist'
+                'error_msg' => 'User with specified id does not exist',
+                'success' => false
             ],401);
         }
         if(!is_null($user_details[0]->barangay_official_id))
         {
             return response()->json([
-                'error_msg' => 'User already has a barangay official entry'
+                'error_msg' => 'User already has a barangay official entry',
+                'success' => false
             ],401);
         }
         $chairmanship = $request->chairmanship;
@@ -41,7 +43,8 @@ class BarangayOfficialController extends Controller
         ");
 
         return response()->json([
-            'msg' => 'User has been assigned as a barangay official'
+            'msg' => 'User has been assigned as a barangay official',
+            'success' => true
         ],200);
     }
     /*public function viewAssignableToBarangayOfficial()
@@ -88,7 +91,8 @@ class BarangayOfficialController extends Controller
         if(count($bo_details) < 1)
         {
             return response()->json([
-                'error_msg' => 'Barangay official record does not exist'
+                'error_msg' => 'Barangay official record does not exist',
+                'success' => false
             ],401);
         }
         DB::statement("UPDATE
@@ -97,7 +101,8 @@ class BarangayOfficialController extends Controller
         WHERE user_id = '$user_id'
         ");
         return response()->json([
-            'msg' => 'Barangay official record status has been changed'
+            'msg' => 'Barangay official record status has been changed',
+            'success' => true
         ],200);
     }
     public function deleteBarangayOfficial(Request $request)
@@ -111,7 +116,8 @@ class BarangayOfficialController extends Controller
         if(count($bo_details) < 1)
         {
             return response()->json([
-                'error_msg' => 'Barangay official record does not exist'
+                'error_msg' => 'Barangay official record does not exist',
+                'success' => false
             ],401);
         }
         DB::statement("DELETE
@@ -119,7 +125,8 @@ class BarangayOfficialController extends Controller
         WHERE user_id = '$user_id'
         ");
         return response([
-            'msg' => 'Barangay official record has been deleted'
+            'msg' => 'Barangay official record has been deleted',
+            'success' => true
         ],200);
     }
 }

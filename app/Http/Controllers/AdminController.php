@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -30,7 +30,8 @@ class AdminController extends Controller
         WHERE user_id = '$user_id'
         ");
         return response()->json([
-            'msg' => 'user has been assigned new role'
+            'msg' => 'user has been assigned new role',
+            'success' => true
         ],200);
     }
     public function viewAssignableRoles()
@@ -61,7 +62,8 @@ class AdminController extends Controller
         WHERE user_id = '$user_id'
         ");
         return response()->json([
-            'msg' => 'Revoked user admin privileges'
+            'msg' => 'Revoked user admin privileges',
+            'success' => true
         ]);
     }
     public function dashboardView()
@@ -79,5 +81,15 @@ class AdminController extends Controller
         FROM users
         ");
         return $view;
+    }
+    public function uploadIdPicture(Request $request)
+    {
+        //$path = $request->file('file')->store('uploads', 's3');
+        $path = Storage::disk('s3')->put('bis',$request->file('file'));
+        //$file = $request->file('image');
+        //$path = Storage::disk('s3')->put('bis', file_get_contents($file));;
+        //Storage::disk('s3')->putFileAs("bis", $request->file, 'test');
+        return 'hi' . env('AWS_ACCESS_KEY_ID');
+        return $path;
     }
 }

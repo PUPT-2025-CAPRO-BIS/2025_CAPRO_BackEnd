@@ -59,3 +59,5 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
 });
 
     Route::get('testEmail', [UserController::class, 'testEmail']);
+
+    Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
