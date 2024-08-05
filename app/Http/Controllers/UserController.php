@@ -37,7 +37,8 @@ class UserController extends Controller
         if(count($exists_email) > 0)
         {
             return response()->json([
-                'error_msg' => 'Email already in use'
+                'error_msg' => 'Email already in use',
+                'success' => false
             ],401);
         }
         DB::statement("INSERT 
@@ -66,6 +67,7 @@ class UserController extends Controller
         ");
         return response()->json([
             'msg' => 'Account created',
+            'success' => true
         ],200);
 
     }
@@ -104,7 +106,8 @@ class UserController extends Controller
         )
         ");
         return response()->json([
-            'access_token' => $token_value
+            'access_token' => $token_value,
+            'success' => true
         ],200);
     }
     public function adminLogin(Request $request)
@@ -151,7 +154,8 @@ class UserController extends Controller
         )
         ");
         return response()->json([
-            'access_token' => $token_value
+            'access_token' => $token_value,
+            'success' => true
         ],200);
     }
     public function getUserDetails()
@@ -233,7 +237,8 @@ class UserController extends Controller
         WHERE id = '$user_id'
         ");
         return response()->json([
-            'msg' => 'Resident official record has been changed'
+            'msg' => 'Resident official record has been changed',
+            'success' => true
         ],200);
     }
     public function deleteResidentInformation(Request $request)
@@ -246,7 +251,8 @@ class UserController extends Controller
         if(count($user_exists) < 1)
         {
             return response()->json([
-                'error_msg' => 'User with id does not exist'
+                'error_msg' => 'User with id does not exist',
+                'success' => false
             ],401);
         }
         DB::statement("DELETE
@@ -254,7 +260,8 @@ class UserController extends Controller
         WHERE id = '$user_id'
         ");
         return response()->json([
-            'msg' => 'User information has been deleted'
+            'msg' => 'User information has been deleted',
+            'success' => true
         ]);
     }
     public function viewCivilStatusTypes()
@@ -303,7 +310,8 @@ class UserController extends Controller
             'last_name' => $user_details[0]->last_name
        ]));
        return response()->json([
-        'msg' => 'OTP Generated. Check email'
+        'msg' => 'OTP Generated. Check email',
+        'success' => true
        ]);
     }
     public function testEmail()
@@ -332,7 +340,8 @@ class UserController extends Controller
         if(count($user_details) < 1)
         {
             return response()->json([
-                'error_msg' => 'User with that email and otp combination cannot be found'
+                'error_msg' => 'User with that email and otp combination cannot be found',
+                'success' => false
             ],401);
         }
         $role_id = 1;
@@ -357,7 +366,8 @@ class UserController extends Controller
         WHERE otp = '$otp'
         ");
         return response()->json([
-            'access_token' => $token_value
+            'access_token' => $token_value,
+            'success' => true
         ],200);
     }
     public function otpChangePassword(Request $request)
@@ -382,7 +392,8 @@ class UserController extends Controller
         if(count($user_details) < 1)
         {
             return response()->json([
-                'error_msg' => 'User with that email and otp combination cannot be found'
+                'error_msg' => 'User with that email and otp combination cannot be found',
+                'success' => false
             ],401);
         }
         $user_id = $user_details[0]->id;
@@ -397,7 +408,8 @@ class UserController extends Controller
         WHERE otp = '$otp'
         ");
         return response()->json([
-            'msg' => 'password changed'
+            'msg' => 'password changed',
+            'success' => true
         ],200);
     }
     function checkIfPhoneNumber($value)

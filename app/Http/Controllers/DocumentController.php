@@ -23,6 +23,10 @@ class DocumentController extends Controller
         VALUES ('$service','$description')
         ");
         */
+        return response()->json([
+            'msg' => 'New document type added',
+            'success' => true
+        ]);
     }
     public function deleteDocumentType(Request $request)
     {
@@ -33,7 +37,8 @@ class DocumentController extends Controller
         WHERE id = '$document_type_id'
         ");
         return response()->json([
-            'msg' => 'Document type has been deleted'
+            'msg' => 'Document type has been deleted',
+            'success' => true
         ]);
     }
     public function getDocumentTypes()
