@@ -112,6 +112,11 @@ class AdminController extends Controller
     public function generatePdf(Request $request)
     {   
         // Pass any data you need to the view
+        $download = 0;
+        if($request->download)
+        {
+            $download = $request->download;
+        }
         $description = DB::select("SELECT
         *
         FROM document_types
@@ -126,6 +131,6 @@ class AdminController extends Controller
         $pdf = Pdf::loadView('document.template', $data);
         $pdf->setPaper('A4','portrait');
         // Return the generated PDF to the browser
-        return $pdf->download('example.pdf');
+        return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', array("Attachment" => false));
     }
 }
