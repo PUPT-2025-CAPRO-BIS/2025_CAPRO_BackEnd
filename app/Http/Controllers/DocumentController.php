@@ -13,7 +13,8 @@ class DocumentController extends Controller
         DB::table('document_types')
             ->insert([
                 'service' => $service,
-                'description' => $description
+                'description' => $description,
+                'created_at' => date('Y-m-d H:i:s')
             ]);
         /*
         DB::statement("INSERT

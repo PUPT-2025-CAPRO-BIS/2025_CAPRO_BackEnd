@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    public function showViewDoc()
+    {
+        return view('document.template');
+    }
     public function noVerificationRegistration(Request $request)
     {
         $email = $request->email;

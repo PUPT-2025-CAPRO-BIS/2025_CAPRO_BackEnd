@@ -57,4 +57,5 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
 });
-Route::get('testEmail', [UserController::class, 'testEmail']);
+
+    Route::get('testEmail', [UserController::class, 'testEmail']);

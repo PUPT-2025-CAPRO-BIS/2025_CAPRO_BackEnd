@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('document_types', function (Blueprint $table) {
             $table->id();
             $table->string('service');
-            $table->string('description');
+            $table->text('description');
+            $table->timestamp('created_at')->nullable();
         });
     }
 
