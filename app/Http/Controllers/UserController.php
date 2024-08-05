@@ -21,12 +21,15 @@ class UserController extends Controller
         $email = $request->email;
         //$pass = $request->pass;
         //$encrypted_pass = password_hash($pass, PASSWORD_DEFAULT);
+        //return strlen($request->cell_number);
+        /*
         if(!$this->checkIfPhoneNumber($request->cell_number))
         {
             return response()->json([
                 'error_msg' => 'Phone number format needs to start with 09 and have a length of 11'
             ]);
         }
+            */
         //$unencrypted_pass = $this->generatePassword(8);
         //$encrypted_pass = password_hash($unencrypted_pass, PASSWORD_DEFAULT);
         $exists_email = DB::select("
@@ -184,6 +187,7 @@ class UserController extends Controller
     }
     public function viewAllUsers(Request $request)
     {
+        /*
         $item_per_page = $request->item_per_page;
         $page_number = $request->page_number;
 
@@ -200,6 +204,32 @@ class UserController extends Controller
             "middle_name like '%$request->search_value%' OR " .
             "last_name like '%$request->search_value%'";
         }
+            */
+
+        $item_per_page_limit ="";
+        $item_per_page = "";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%'";
+        }
+
+
 
         $users = DB::select("SELECT
         u.id,
@@ -221,7 +251,7 @@ class UserController extends Controller
         FROM users
         $search_value
         ORDER BY id
-        LIMIT $item_per_page
+        $item_per_page_limit
         $offset_value
         ) as u
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
