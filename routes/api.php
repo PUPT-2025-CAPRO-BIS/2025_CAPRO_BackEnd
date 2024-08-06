@@ -46,6 +46,7 @@ Route::middleware(['AuthUser:3'])->group(function () {
 Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('addDocumentType', [DocumentController::class, 'addDocumentType']);
     Route::get('getDocumentTypes', [DocumentController::class, 'getDocumentTypes']);
+    Route::post('updateDocumentTypes', [DocumentController::class, 'updateDocumentTypes']);
     Route::post('deleteDocumentType', [DocumentController::class, 'deleteDocumentType']);
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     //Route::get('viewAssignableToBarangayOfficial', [BarangayOfficialController::class, 'viewAssignableToBarangayOfficial']);
