@@ -117,13 +117,15 @@ class AdminController extends Controller
         {
             $download = $request->download;
         }
-        $description = DB::select("SELECT
+        $doc = DB::select("SELECT
         *
         FROM document_types
         WHERE id = '$request->doc_id'
-        ")[0]->description;
+        ")[0];
+        $description =$doc->description;
+        $title = $doc->service;
         $data = [
-            'title' => 'Laravel PDF Example',
+            'title' => $title,
             'html_code' => $description
         ];
 

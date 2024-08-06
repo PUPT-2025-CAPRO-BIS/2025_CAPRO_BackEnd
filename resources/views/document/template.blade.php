@@ -249,185 +249,247 @@
         }
     </style>
 </head>
-<div class='w-100 d-flex' style = "clear:both; position:relative;min-height: 100%;">
-        <div class='col-4 bg-green' style="position:absolute; left:0pt; width:180pt;">
+<div style="width: 100% ; display: flex; clear:both; position:relative;border-color">
+    <div style="background-color: #058c61; width: 30%;position:absolute; left:0pt;top:0pt;bottom:0pt;padding-left:1%;min-height: 100%">
 
-            <div class='d-flex align-items-center justify-content-center mt-4'>
-            <img    
-                class='ms-5'
-                        style="
-                        height: 150px;
-                        width: 150px
-                        "
-                        src='./images/central.png'
-                    />
-            </div>
-
-            <div class='mt-5 d-flex alig-items-center justify-content-center'>
-                <span class='f-white fw-bold'>
-                    Barangay Council
-                </span>
-            </div>
-
-            <div class='mt-5 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. RODOLFO E. TANGPUZ II
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    BARANGAY CHAIRMAN
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. MARIA CECILIA T. BALMORI
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    KAGAWAD FOR CULTURAL & SPORT
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. VENADIK M. CASTRO
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    KAGAWAD CHAIRMAN FOR PEACE & ORDER
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. LEAH M. PEREZ
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    KAGAWAD
-                    CHAIRMAN FOR APPROPRIATION,
-                    EDUCATION & INFORMATION
-                    DISSEMINATION
-                </span>
-            </div>
-
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. CRISTINA O. SANARES
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    KAGAWAD
-                    CHAIRMAN FOR ELDERLY & PDAO,
-                    FAMILY AFFAIRS
-                </span>
-            </div>
-
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. OLIVER G. OSANO
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    KAGAWAD CHAIRMAN FOR TRANSPORTATION
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. PIULY B. DULANG
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    CHAIRMAN FOR HEALTH & ENVIRONMENT SANITATION
-                </span>
-            </div>
-
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    HON. ALYNN REIGN A. RAFIÑAN
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    SK CHAIRPERSON
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    OLGA H. CALAYO
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    BARANGAY SECRETARY
-                </span>
-            </div>
-
-            <div class='mt-4 d-flex flex-column  justify-content-center ms-3'>
-                <span class='f-white fw-bold tempate-font-officials'>
-                    LILIA T. AMADOR
-                </span>
-                <span class='f-white tempate-font-officials'>
-                    BARANGAY TREASURER
-                </span>
-            </div>
-
-
+        <div style="align-items:center;justify-content:center;margin-left:40px">
+            <img
+                className='ms-5'
+                style="
+                    height: 150px;
+                    width: 150px
+                "
+                src='./images/central.png'
+            />
         </div>
 
-        <div class='col-8 bg-white' style="margin-left:200pt">
-            <div class='d-flex align-items-center justify-content-center mt-5' style="clear:both; position:relative">
-                <div style="position:absolute; left:0pt; width:200pt;top:12pt">
-                    <div class='d-flex flex-column align-items-center justify-content-center' style="justify-content:center:align-content:center">
-                        <h4 class='fw-normal' style="font-weight: 400;text-align:center">
-                            REPUBLIC OF THE PHILIPPINES
-                        </h4>
-                        <h4 class='fw-normal' style="text-align:center">
-                            CITY OF TAGUIG
-                        </h4>
-                    </div>
-
-                    <div class='d-flex flex-column align-items-center justify-content-center'>
-                        <h4 class='bold' style="text-align:center">
-                            BARANGAY CENTRAL BICUTAN
-                        </h4>
-                    </div>
-                </div>
-                <div style="margin-left:200pt">
-                    <img    
-                        class='ms-5'
-                        style="
-                            height: 120px;
-                            width: 120px
-                            "
-                        src='./images/taguig.png'
-                    />
-                </div>
-            </div>
-
-
-            <div class='mt-5 d-flex flex-column align-items-center justify-content-center' style="margin-right:40pt">
-                <h4 class='fw-normal' style="text-align:center">
-                    OFFICE OF THE BARANGAY CHAIRMAN
-                </h4>
-            </div>
-
-            <div class='mt-4 d-flex flex-column align-items-center justify-content-center' style="margin-right:40pt">
-                <h4 id='document-title' class='' style="text-align:center">
-                    BARANGAY CLEARANCE
-                </h4>
-            </div>
-
-
-            <div id='document-body' class='' style="height:520px">
-                {!!$html_code!!}
-            </div>
-
-            <div class='flex-column d-flex align-items-end pe-5'>
-                <span class='fw-bold'>
-                    HON. RODOLFO E. TANGPUZ II
-                </span>
-                <span class='fst-italic'>
-                    Barangay Chairman
-                </span>
-            </div>
-
-
+        <div
+            style="margin-top:30px;display:flex;align-items:center;justify-content:center;text-align:center"
+        >
+            <span style="color: white; font-weight: bold">
+                Barangay Council
+            </span>
         </div>
+
+        <div
+            style=" margin-top: 30px;justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold; font-size: 10px" 
+            >
+                HON. RODOLFO E. TANGPUZ II </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                BARANGAY CHAIRMAN
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. MARIA CECILIA T. BALMORI </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                KAGAWAD FOR CULTURAL & SPORT
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. VENADIK M. CASTRO </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                KAGAWAD CHAIRMAN FOR PEACE & ORDER
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. LEAH M. PEREZ </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                KAGAWAD
+                CHAIRMAN FOR APPROPRIATION,
+                EDUCATION & INFORMATION
+                DISSEMINATION
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. OLIVER G. OSANO </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                KAGAWAD CHAIRMAN FOR TRANSPORTATION
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. PIULY B. DULANG </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                CHAIRMAN FOR HEALTH & ENVIRONMENT SANITATION
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                HON. ALYNN REIGN A. RAFIÑAN </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                SK CHAIRPERSON
+            </span>
+        </div>
+
+
+
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                OLGA H. CALAYO </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                BARANGAY SECRETARY
+            </span>
+        </div>
+
+        <div
+            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 10px" 
+            >
+                LILIA T. AMADOR </br>
+            </span>
+            <span
+                style=" color: white;font-size:10px"
+            >
+                BARANGAY TREASURER
+            </span>
+        </div>
+
+
+
+
+
+
+    </div>
+
+    <div 
+        style="backgroundClip:white;width:70%;margin-left:31%;align-items:center;text-align:center"
+    >
+        <div
+            style="
+                display:flex; align-items:center; justify-content:space-between;margin-top:50px"
+        >
+            <div style="clear:both; position:relative">
+
+            <div style="position:absolute; left:0pt; margin-top: 30px;margin-left:50px">
+                <div
+                    style="display:flex; flex-direction:column; align-items:center; justify-content:center"
+                >
+                    <h4  style="font-weight:normal">
+                        REPUBLIC OF THE PHILIPPINES
+                    </h4>
+                    <h4  style="font-weight:normal">
+                        CITY OF TAGUIG
+                    </h4>
+                </div>
+
+                <div 
+                     style="flex-direction:column; align-items:center; justify-content:center"
+                >
+                    <h4  style="font-weight:bold">
+                        BARANGAY CENTRAL BICUTAN
+                    </h4>
+                </div>
+            </div>
+            <div style="margin-left:300px">
+            <img
+                style="
+                    height: 120px;
+                    width: 120px;"
+                src='./images/taguig.png'
+            />
+            </div>
+            </div>
+        </div>
+
+
+        <div 
+            style="display:'flex', align-items:'center', justify-content:center; margin-top:50px"
+        >
+            <h4 className='fw-normal'>
+                OFFICE OF THE BARANGAY CHAIRMAN
+            </h4>
+        </div>
+
+        <div 
+            style="margin-top:50px;display:flex; flex-direction:column; align-items:center; justify-content:center"
+        >
+            <h4 id='document-title' >
+                {!! $title !!}
+            </h4>
+        </div>
+        <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:100%;text-align:left;padding-left: 15px;padding-right:15px">
+            {!! $html_code !!}
+        </div>
+        <div className='flex-column d-flex align-items-end pe-5'
+            style="flex-direction:column; display:flex; align-items:center; padding-right:50px;clear:both; position:relative"
+        >
+            <span    style="font-weight:bold;position:absolute; right:20pt">
+                HON. RODOLFO E. TANGPUZ II
+            </span>
+            <span style="font-style: italic;position:absolute; right:20pt;margin-top:15pt">
+                Barangay Chairman
+            </span>
+        </div>
+
+
+    </div>
 
 </div>
