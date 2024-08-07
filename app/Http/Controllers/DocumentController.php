@@ -61,9 +61,13 @@ class DocumentController extends Controller
         $update_string .= !is_null($request->service) ? "service = '$request->service'," : '';
         $update_string .= !is_null($request->isCertificate) ? "isCertificate = '$request->isCertificate'," : '';
         $update_string = rtrim($update_string, ',');
-        DB::statement("UPDATE document_types
-        $update_string
-        ");
+        if(!is_null($request->service) || !is_null($request->isCertificate))
+        {
+            DB::statement("UPDATE document_types
+            $update_string
+            where id = '$request->doc_id'
+            ");
+        }
         if($request->description)
         {
             DB::table('document_types')
@@ -72,11 +76,7 @@ class DocumentController extends Controller
                     'description' => $request->description
                 ]);
         }
-        DB::table('document_types')
-                ->where('id','=',$request->doc_id)
-                ->update([
-                    'description' => $request->description
-                ]);
+        
         return response()->json([
             'msg' => 'Document edited',
             'success' => true
