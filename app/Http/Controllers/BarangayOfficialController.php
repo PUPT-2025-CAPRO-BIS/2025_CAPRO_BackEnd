@@ -95,7 +95,15 @@ class BarangayOfficialController extends Controller
         $item_per_page_limit
         $offset_value
         ");
-        return response()->json($barangay_officials,200);
+        $total_pages = DB::select("SELECT
+        count(u.id) as page_count
+        FROM barangay_officials as bo
+        LEFT JOIN users as u on bo.user_id = u.id
+        $search_value
+        ORDER BY bo.id
+        ")[0]->page_count;
+        $total_pages = ceil($total_pages/$item_per_page );
+        return response()->json(['data'=>$barangay_officials,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
     }
     public function changeBarangayOfficialDetails(Request $request)
     {
