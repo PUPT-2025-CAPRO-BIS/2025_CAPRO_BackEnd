@@ -47,13 +47,45 @@ class DocumentController extends Controller
             'success' => true
         ]);
     }
-    public function getDocumentTypes()
+    public function getDocumentTypes(Request $request)
     {
+        $item_per_page = "";
+        $item_per_page_limit ="";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE service like '%$request->search_value%'";
+        }
         $values = DB::select("SELECT
         * 
         FROM document_types
+        $search_value
+        ORDER BY id
+        $item_per_page_limit
+        $offset_value
         ");
-        return response()->json($values,200);
+        $total_pages = DB::select("SELECT
+        count(id) as page_count
+        FROM document_types
+        $search_value
+        ORDER BY id
+        ")[0]->page_count;
+
+        $total_pages = ceil($total_pages/$item_per_page);
+        return response()->json(['data'=>$values,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
     }
     public function updateDocumentTypes(Request $request)
     {
