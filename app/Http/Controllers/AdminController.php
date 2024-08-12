@@ -135,4 +135,69 @@ class AdminController extends Controller
         // Return the generated PDF to the browser
         return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', array("Attachment" => false));
     }
+
+    public function viewAppointmentList(Request $request)
+    {
+        $date_filter = '';
+        if($request->schedule_date)
+        {
+            $date_filter = "WHERE apt.schedule_date = '$request->schedule_date'";
+        }
+        $appointments = DB::select("SELECT
+                apt.id as appointment_id,
+                CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+                apt.document_type_id,
+                doc_type.service as document_type,
+                apt.schedule_date,
+                apt.status,
+                (
+                    SELECT
+                    GROUP_CONCAT(appointment_id)
+                    FROM supporting_files
+                    WHERE appointment_id = apt.id
+                    ) as supporting_file_ids
+                FROM appointments as apt
+                LEFT JOIN users as u on u.id = apt.user_id
+                LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+                $date_filter
+        ");
+        foreach($appointments as $appointment)
+        {
+            $appointment->supporting_file_ids = explode(',', $appointment->supporting_file_ids);
+        }
+        return response()->json([
+            'data' => $appointments,
+        ]);
+    }
+    public function viewSpecificFile(Request $request)
+    {
+        return DB::select("SELECT base64_file FROM supporting_files WHERE id = $request->supporting_file_id")[0]->base64_file;
+    }
+    public function viewFileList(Request $request)
+    {
+        $filter_value = "";
+        if($request->appointment_id)
+        {
+            $filter_value = "WHERE appointment_id = '$request->appointment_id'";
+        }
+        else if($request->user_id)
+        {
+            $filter_value = "WHERE user_id = '$request->user_id'";
+        }
+        else
+        {
+            return response()->json([
+                'error' => true,
+                'error_msg' => 'You need to set either the user_id or appointment_id parameter'
+            ],401);
+        }
+        return DB::select("SELECT
+                id,
+                user_id,
+                appointment_id,
+                created_at
+                FROM supporting_files
+                $filter_value
+            ");
+    }
 }

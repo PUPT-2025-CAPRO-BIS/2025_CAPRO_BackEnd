@@ -8,6 +8,7 @@ use App\Rules\isPhNumber;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\OTPEmail;
+use Illuminate\Support\Facades\Storage;
 use DB;
 
 class UserController extends Controller
@@ -333,6 +334,7 @@ class UserController extends Controller
     public function generateOTP(Request $request)
     {
         $current_date_time = date('Y-m-d H:i:s');
+
         $user_details = DB::select("SELECT
         u.id,
         u.Email,
@@ -351,9 +353,16 @@ class UserController extends Controller
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
-        WHERE u.email = '$request->email'
+         WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
         ");
-        $user_id = $user_details[0]->id;
+        if(count($user_details)<1)
+        {
+            return response()->json([
+                'error' => true,
+                'error_msg' => 'A user with this email and birthday does not exist'
+            ]);
+        }
+        $user_id = $user_details[0]->id;    
         $otp = $this->generatePassword(6);
         DB::statement("INSERT INTO
         otps
@@ -361,7 +370,7 @@ class UserController extends Controller
         VALUES
         ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute))
         ");
-        Mail::to('bisappct@gmail.com')->send(new OTPEmail([
+        Mail::to('bc00005rc@gmail.com')->send(new OTPEmail([
             'otp' => $otp,
             'email_address' => $request->email,
             'first_name' => $user_details[0]->first_name,
@@ -370,7 +379,7 @@ class UserController extends Controller
        ]));
        return response()->json([
         'msg' => 'OTP Generated. Check email',
-        'success' => true
+        'success' => true,
        ]);
     }
     public function testEmail()
@@ -471,6 +480,23 @@ class UserController extends Controller
             'success' => true
         ],200);
     }
+
+    function checkIfEmailExists(Request $request)
+    {
+        $exists_email = DB::table("SELECT 
+        email
+        FROM users
+        where email = '$request->email'");
+        if(count($exists_email)>0)
+        {
+            return $exists_email;
+        }
+        else
+        {
+            return [];
+        }
+    }
+
     function checkIfPhoneNumber($value)
     {
         if(substr($value, 0, 2) != '09')
@@ -482,4 +508,45 @@ class UserController extends Controller
             return false;
         }
     }
+
+    function createAppointment(Request $request)
+    {
+
+        $document_type_id = $request->document_type_id;
+        $schedule_date = $request->schedule_date;
+        $status = 'Pending';
+        $user_id = session("UserId");
+        $date_now = date('Y-m-d H:i:s');
+        $files = $request->file('file_upload');
+
+        //$file = $request->file('file_upload');
+
+        // Get the file contents
+
+        $appointment_id = DB::table('appointments')
+            ->insertGetId([
+                'document_type_id' => $document_type_id,
+                'user_id' => $user_id,
+                'schedule_date' => $schedule_date,
+                'status' => $status
+            ]);
+        //if ($request->hasFile('file_upload')) {
+        //    foreach ($files as $file) {
+            foreach($request->file_upload as $file) {
+                //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
+                //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+                DB::statement("INSERT INTO
+                supporting_files
+                (user_id,appointment_id,created_at,base64_file)
+                VALUES('$user_id','$appointment_id','$date_now','$file')
+                ");
+            }
+        // }
+        return response()->json([
+            'msg' => 'Appointment made',
+            'success' => true 
+        ]);
+
+    }
+    
 }

@@ -27,6 +27,11 @@ Route::middleware(['AuthUser:1-2-3'])->group(function () {
     Route::get('getUserDetails', [UserController::class, 'getUserDetails']);
     Route::get('viewCivilStatusTypes', [UserController::class, 'viewCivilStatusTypes']);
     Route::get('viewBarangayOfficials', [BarangayOfficialController::class, 'viewBarangayOfficials']);
+    Route::get('getDocumentTypes', [DocumentController::class, 'getDocumentTypes']);
+    Route::post('createAppointment', [UserController::class, 'createAppointment']);
+    Route::get('viewAppointmentList', [AdminController::class, 'viewAppointmentList']);
+    Route::get('viewSpecificFile', [AdminController::class, 'viewSpecificFile']);
+    Route::get('viewFileList', [AdminController::class, 'viewFileList']);
 });
 Route::post('noVerificationRegistration', [UserController::class, 'noVerificationRegistration']);
 Route::post('testString', [DocumentController::class, 'testString']);
@@ -45,7 +50,6 @@ Route::middleware(['AuthUser:3'])->group(function () {
 });
 Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('addDocumentType', [DocumentController::class, 'addDocumentType']);
-    Route::get('getDocumentTypes', [DocumentController::class, 'getDocumentTypes']);
     Route::post('updateDocumentTypes', [DocumentController::class, 'updateDocumentTypes']);
     Route::post('deleteDocumentType', [DocumentController::class, 'deleteDocumentType']);
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
@@ -57,8 +61,8 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
-
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
     Route::get('generatePdf', [AdminController::class, 'generatePdf']);
+    
