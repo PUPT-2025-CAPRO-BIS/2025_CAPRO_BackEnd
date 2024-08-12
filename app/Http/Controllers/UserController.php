@@ -272,6 +272,19 @@ class UserController extends Controller
     
         return $result;
     }
+
+    function generateOTPString($length = 8) {
+        $chars = '0123456789';
+        $count = mb_strlen($chars);
+
+        for ($i = 0, $result = ''; $i < $length; $i++) {
+            $index = rand(0, $count - 1);
+            $result .= mb_substr($chars, $index, 1);
+        }
+
+        return $result;
+    }
+
     public function changeResidentInformation(Request $request)
     {
         $user_id = $request->user_id;
@@ -363,7 +376,7 @@ class UserController extends Controller
             ]);
         }
         $user_id = $user_details[0]->id;    
-        $otp = $this->generatePassword(6);
+        $otp = $this->generateOTPString(6);
         DB::statement("INSERT INTO
         otps
         (otp,user_id,status,expires_at)
