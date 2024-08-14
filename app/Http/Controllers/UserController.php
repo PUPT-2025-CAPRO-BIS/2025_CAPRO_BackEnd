@@ -272,19 +272,17 @@ class UserController extends Controller
     
         return $result;
     }
-
     function generateOTPString($length = 8) {
         $chars = '0123456789';
         $count = mb_strlen($chars);
-
+    
         for ($i = 0, $result = ''; $i < $length; $i++) {
             $index = rand(0, $count - 1);
             $result .= mb_substr($chars, $index, 1);
         }
-
+    
         return $result;
     }
-
     public function changeResidentInformation(Request $request)
     {
         $user_id = $request->user_id;
@@ -366,7 +364,7 @@ class UserController extends Controller
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
-         WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
+        WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
         ");
         if(count($user_details)<1)
         {
@@ -381,7 +379,7 @@ class UserController extends Controller
                 'error' => true,
                 'error_msg'=> 'You currently have a blotter report against you. Please resolve at the barangay hall'
             ]);
-        }  
+        }
         $user_id = $user_details[0]->id;
         $otp = $this->generateOTPString(6);
         DB::statement("INSERT INTO
@@ -429,7 +427,8 @@ class UserController extends Controller
         {
             return response()->json([
                 'error_msg' => 'User with that email and otp combination cannot be found',
-                'success' => false
+                'success' => false,
+                'error' => true
             ],401);
         }
         $role_id = 1;
@@ -500,7 +499,6 @@ class UserController extends Controller
             'success' => true
         ],200);
     }
-
     function checkIfEmailExists(Request $request)
     {
         $exists_email = DB::table("SELECT 
@@ -516,7 +514,6 @@ class UserController extends Controller
             return [];
         }
     }
-
     function checkIfPhoneNumber($value)
     {
         if(substr($value, 0, 2) != '09')
@@ -528,21 +525,26 @@ class UserController extends Controller
             return false;
         }
     }
-
     function createAppointment(Request $request)
     {
-
+        
         $document_type_id = $request->document_type_id;
         $schedule_date = $request->schedule_date;
         $status = 'Pending';
         $user_id = session("UserId");
         $date_now = date('Y-m-d H:i:s');
-        $files = $request->file('file_upload');
-
+        if(count($request->file_upload) < 1)
+        {
+            return response()->json([
+                'error' => true,
+                'error_msg' => 'There are no files attached',
+                'success' => false
+            ],200);
+        }
         //$file = $request->file('file_upload');
-
+        
         // Get the file contents
-
+        
         $appointment_id = DB::table('appointments')
             ->insertGetId([
                 'document_type_id' => $document_type_id,
