@@ -42,8 +42,9 @@ class UserController extends Controller
         {
             return response()->json([
                 'error_msg' => 'Email already in use',
-                'success' => false
-            ],401);
+                'success' => false,
+                'error' => true
+            ],200);
         }
         DB::statement("INSERT 
         INTO users
@@ -188,6 +189,8 @@ class UserController extends Controller
     }
     public function viewAllUsers(Request $request)
     {
+        
+        $user_id = session("UserId");
         /*
         $item_per_page = $request->item_per_page;
         $page_number = $request->page_number;
@@ -225,9 +228,9 @@ class UserController extends Controller
         $search_value = '';
         if($request->search_value)
         {
-            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            $search_value = "AND (first_name like '%$request->search_value%' OR ".
             "middle_name like '%$request->search_value%' OR " .
-            "last_name like '%$request->search_value%'";
+            "last_name like '%$request->search_value%')";
         }
 
 
@@ -250,6 +253,7 @@ class UserController extends Controller
         FROM(
         SELECT *
         FROM users
+        WHERE id != '$user_id'
         $search_value
         ORDER BY id
         $item_per_page_limit
@@ -259,7 +263,18 @@ class UserController extends Controller
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
         ");
-        return response()->json($users,200);
+
+        $total_pages = DB::select("SELECT
+        count(id) as page_count
+        FROM users
+        WHERE id != '$user_id'
+        $search_value
+        ORDER BY id
+        ")[0]->page_count;
+
+        $total_pages = ceil($total_pages/$item_per_page);
+        return response()->json(['data'=>$users,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
+        //return response()->json($users,200);
     }
     function generatePassword($length = 8) {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -285,7 +300,7 @@ class UserController extends Controller
     }
     public function changeResidentInformation(Request $request)
     {
-        $user_id = $request->user_id;
+        $user_id = $request->id;
         $update_string = 'SET ';
         $update_string .= !is_null($request->first_name) ? "first_name = '$request->first_name'," : '';
         $update_string .= !is_null($request->middle_name) ? "middle_name = '$request->middle_name'," : '';
@@ -294,6 +309,7 @@ class UserController extends Controller
         $update_string .= !is_null($request->birthday) ? "birthday = '$request->birthday'," : '';
         $update_string .= !is_null($request->cell_number) ? "cell_number = '$request->cell_number'," : '';
         $update_string .= !is_null($request->civil_status_id) ? "civil_status_id = '$request->civil_status_id'," : '';
+        $update_string .= !is_null($request->male_female) ? "male_female = '$request->male_female'," : '';
         $update_string = rtrim($update_string, ',');
         $bo_details = DB::SELECT("SELECT
         user_id,
