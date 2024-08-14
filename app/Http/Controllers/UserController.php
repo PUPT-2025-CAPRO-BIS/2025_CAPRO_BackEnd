@@ -8,6 +8,7 @@ use App\Rules\isPhNumber;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\OTPEmail;
+use App\Mail\CreatedAppointmentMail;
 use Illuminate\Support\Facades\Storage;
 use DB;
 
@@ -580,6 +581,22 @@ class UserController extends Controller
                 ");
             }
         // }
+        $user_details = DB::table('users')
+            ->select(
+                'email',
+                'first_name',
+                'middle_name',
+                'last_name'
+            )
+            ->where('id','=',$user_id)
+            ->get();
+        Mail::to('bc00005rc@gmail.com')->send(new CreatedAppointmentMail([
+            'schedule_date' => $request->schedule_date,
+            'email_address' => $user_details[0]->email,
+            'first_name' => $user_details[0]->first_name,
+            'middle_name' => $user_details[0]->middle_name,
+            'last_name' => $user_details[0]->last_name
+        ]));
         return response()->json([
             'msg' => 'Appointment made',
             'success' => true 
