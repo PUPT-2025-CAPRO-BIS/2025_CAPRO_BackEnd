@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BarangayOfficialController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\NewResidentController;
 
 
 
@@ -61,8 +62,10 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
+    Route::get('viewNewResidentRequests', [NewResidentController::class, 'viewNewResidentRequests']);
+    Route::post('approveNewResident', [NewResidentController::class, 'approveNewResident']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
     Route::get('generatePdf', [AdminController::class, 'generatePdf']);
-    
+    Route::post('applyNewResident', [UserController::class, 'applyNewResident']);

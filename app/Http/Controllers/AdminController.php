@@ -133,6 +133,7 @@ class AdminController extends Controller
         $pdf = Pdf::loadView('document.template', $data);
         $pdf->setPaper('A4','portrait');
         // Return the generated PDF to the browser
+        
         return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', array("Attachment" => false));
     }
 
@@ -145,6 +146,7 @@ class AdminController extends Controller
         }
         $appointments = DB::select("SELECT
                 apt.id as appointment_id,
+                u.id as user_id,
                 CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
                 apt.document_type_id,
                 doc_type.service as document_type,

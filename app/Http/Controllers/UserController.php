@@ -82,6 +82,78 @@ class UserController extends Controller
         ],200);
 
     }
+    public function applyNewResident(Request $request)
+    {
+        $date_now = date('Y-m-d H:i:s');
+        $email = $request->email;
+        //$pass = $request->pass;
+        //$encrypted_pass = password_hash($pass, PASSWORD_DEFAULT);
+        //return strlen($request->cell_number);
+        /*
+        if(!$this->checkIfPhoneNumber($request->cell_number))
+        {
+            return response()->json([
+                'error_msg' => 'Phone number format needs to start with 09 and have a length of 11'
+            ]);
+        }
+            */
+        //$unencrypted_pass = $this->generatePassword(8);
+        //$encrypted_pass = password_hash($unencrypted_pass, PASSWORD_DEFAULT);
+        $exists_email = DB::select("
+            SELECT *
+            FROM users
+            where email = '$request->email'
+        ");
+        if(count($exists_email) > 0)
+        {
+            return response()->json([
+                'error_msg' => 'Email already in use',
+                'success' => false,
+                'error' => true
+            ],200);
+        }
+        $user_id = DB::table('users')
+            ->insertGetId([
+                'first_name' => $request->first_name,
+                'middle_name' => $request->middle_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'email_verified_at' => NULL,
+                'birthday' => $request->birthday,
+                'cell_number' => $request->cell_number,
+                'civil_status_id' => $request->civil_status_id,
+                'male_female' => $request->male_female,
+                'current_address' => $request->current_address,
+                'isPendingResident' => '1'
+            ]);
+        foreach($request->file_upload as $file) {
+            //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
+            //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+            DB::statement("INSERT INTO
+            supporting_files
+            (user_id,appointment_id,created_at,base64_file)
+            VALUES('$user_id','0','$date_now','$file')
+            ");
+        }
+        DB::statement("INSERT
+        INTO user_roles (user_id,role_id)
+        SELECT
+        us.id as user_id,
+        '1' as role_id
+        FROM users as us
+        where us.email = '$request->email'
+        ");
+        if($request->file)
+        {
+            $path = Storage::disk('s3')->put('bis',$request->file('file_upload'));
+            return 'hi' . env('AWS_ACCESS_KEY_ID');
+        }
+        return response()->json([
+            'msg' => 'Account created',
+            'success' => true
+        ],200);
+
+    }
     public function manualLogin(Request $request)
     {
         $current_date_time = date('Y-m-d H:i:s');
@@ -255,6 +327,7 @@ class UserController extends Controller
         SELECT *
         FROM users
         WHERE id != '$user_id'
+        AND (isPendingResident != '1' OR isPendingResident IS NULL)
         $search_value
         ORDER BY id
         $item_per_page_limit
@@ -269,6 +342,7 @@ class UserController extends Controller
         count(id) as page_count
         FROM users
         WHERE id != '$user_id'
+        AND (isPendingResident != '1' OR isPendingResident IS NULL)
         $search_value
         ORDER BY id
         ")[0]->page_count;
@@ -373,6 +447,7 @@ class UserController extends Controller
         ct.civil_status_type,
         u.male_female,
         u.birthday,
+        u.isPendingResident,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
@@ -397,6 +472,13 @@ class UserController extends Controller
                 'error_msg'=> 'You currently have a blotter report against you. Please resolve at the barangay hall'
             ]);
         }
+        if($user_details[0]->isPendingResident == '1')
+        {
+            return response()->json([
+                'error' => true,
+                'error_msg'=> 'Your account has not yet been approved. Please wait for admin approval'
+            ]);
+        }
         $user_id = $user_details[0]->id;
         $otp = $this->generateOTPString(6);
         DB::statement("INSERT INTO
@@ -405,7 +487,9 @@ class UserController extends Controller
         VALUES
         ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute))
         ");
-        Mail::to('bc00005rc@gmail.com')->send(new OTPEmail([
+        Mail::to($user_details[0]->email)
+            ->cc('bc00005rc@gmail.com')
+            ->send(new OTPEmail([
             'otp' => $otp,
             'email_address' => $request->email,
             'first_name' => $user_details[0]->first_name,
@@ -590,7 +674,9 @@ class UserController extends Controller
             )
             ->where('id','=',$user_id)
             ->get();
-        Mail::to('bc00005rc@gmail.com')->send(new CreatedAppointmentMail([
+        Mail::to($user_details[0]->email)
+            ->cc('bc00005rc@gmail.com')
+            ->send(new CreatedAppointmentMail([
             'schedule_date' => $request->schedule_date,
             'email_address' => $user_details[0]->email,
             'first_name' => $user_details[0]->first_name,
