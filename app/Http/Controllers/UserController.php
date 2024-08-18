@@ -71,6 +71,19 @@ class UserController extends Controller
         FROM users as us
         where us.email = '$request->email'
         ");
+        if($request->file_upload)
+        {
+            foreach($request->file_upload as $file) {
+            //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
+            //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+            DB::statement("INSERT INTO
+            supporting_files
+            (user_id,appointment_id,created_at,base64_file)
+            VALUES('$user_id','0','$date_now','$file')
+            ");
+            }
+        }
+        
         if($request->file)
         {
             $path = Storage::disk('s3')->put('bis',$request->file('file_upload'));
