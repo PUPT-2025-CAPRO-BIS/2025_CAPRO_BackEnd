@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BarangayOfficialController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\NewResidentController;
+use App\Http\Controllers\BlotterController;
 
 
 
@@ -64,8 +65,10 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
     Route::get('viewNewResidentRequests', [NewResidentController::class, 'viewNewResidentRequests']);
     Route::post('approveNewResident', [NewResidentController::class, 'approveNewResident']);
+    Route::post('fileBlotterReport', [BlotterController::class, 'fileBlotterReport']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
     Route::get('generatePdf', [AdminController::class, 'generatePdf']);
     Route::post('applyNewResident', [UserController::class, 'applyNewResident']);
+    
