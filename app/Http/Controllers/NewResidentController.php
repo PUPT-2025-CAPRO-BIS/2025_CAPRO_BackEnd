@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DynamicMail;
 
 class NewResidentController extends Controller
 {
@@ -107,11 +109,31 @@ class NewResidentController extends Controller
     }
     public function approveNewResident(Request $request)
     {
+        $user_details = DB::table('users')
+            ->where('id','=',$request->user_id)
+            ->get();
+        if(count($user_details)<1)
+        {
+            return response()->json([
+                'error_msg' => 'New resident request does not exist',
+                'error' => true
+            ]);
+        }
+        $first_name = $user_details[0]->first_name;
+        $subject  = 'Your Resident Account Has Been Approved';
+        $content  = "Greetings $first_name, <br><br>";
+        $content .= "Your resident request has been approved. You can now file for an appointment and request your needed document.";
         DB::table('users')
             ->where('id','=',$request->user_id)
             ->update([
-                'isPendingResident' => '0'
+                'isPendingResident' => 0
             ]);
+        Mail::to($user_details[0]->email)
+            ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
+            ->send(new DynamicMail([
+            'subject' => $subject,
+            'content' => $content
+        ]));
         return response()->json([
             'msg' => 'New resident has been approved',
             'success' => true
