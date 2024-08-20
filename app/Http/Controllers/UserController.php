@@ -479,10 +479,6 @@ class UserController extends Controller
         u.male_female,
         u.birthday,
         u.isPendingResident,
-        (SELECT count(br.id) FROM blotter_reports as br 
-            --WHERE br.complainee_name like CONCAT('%', u.first_name, '%') 
-            --AND br.complainee_name like CONCAT('%', u.last_name, '%')
-        ) as name_has_blotter,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
@@ -493,7 +489,6 @@ class UserController extends Controller
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
         WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
         ");
-        //return $user_details[0];
         if(count($user_details)<1)
         {
             return response()->json([
@@ -501,11 +496,16 @@ class UserController extends Controller
                 'error_msg' => 'A user with this email and birthday does not exist'
             ]);
         }
-        if($user_details[0]->Email == 'lucie41@example.com')
+        $user_first_name = $user_details[0]->first_name;
+        $user_last_name = $user_details[0]->last_name;
+        $blotter_info = DB::table('blotter_reports')
+            ->whereRaw("complainee_name like '%$user_first_name%' AND complainee_name like '%$user_last_name%' AND status_resolved = 0")
+            ->get();
+        if(count($blotter_info) > 0)
         {
             return response()->json([
                 'error' => true,
-                'error_msg'=> 'You currently have a blotter report against you. Please resolve at the barangay hall'
+                'error_msg'=> 'There is currently a blotter report with your name, please go to the barangay to resolve this.'
             ]);
         }
         if($user_details[0]->isPendingResident == '1')

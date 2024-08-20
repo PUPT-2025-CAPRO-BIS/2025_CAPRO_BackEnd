@@ -51,6 +51,7 @@ Route::middleware(['AuthUser:3'])->group(function () {
     Route::get('viewPrivilegedUsers', [AdminController::class, 'viewPrivilegedUsers']);
 });
 Route::middleware(['AuthUser:2-3'])->group(function () {
+    Route::get('viewAllBlotters', [BlotterController::class, 'viewAllBlotters']);
     Route::post('addDocumentType', [DocumentController::class, 'addDocumentType']);
     Route::post('updateDocumentTypes', [DocumentController::class, 'updateDocumentTypes']);
     Route::post('deleteDocumentType', [DocumentController::class, 'deleteDocumentType']);
