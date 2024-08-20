@@ -59,4 +59,97 @@ class BlotterController extends Controller
                 'status_resolved' => 0
             ]);
     }
+    public function viewAllBlotters(Request $request)
+    {
+        
+        $user_id = session("UserId");
+        /*
+        $item_per_page = $request->item_per_page;
+        $page_number = $request->page_number;
+
+        $offset = $item_per_page * ($page_number - 1);
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%'";
+        }
+            */
+
+        $item_per_page_limit ="";
+        $item_per_page = "";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = 
+            "AND (
+            complainee_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%' OR " .
+            ")";
+        }
+
+
+
+        $blotters = DB::select("SELECT
+        *
+        FROM(
+        SELECT *
+        FROM blotter_reports
+        $search_value
+        ORDER BY id
+        $item_per_page_limit
+        $offset_value
+        ) as br
+        LEFT JOIN
+        ( SELECT
+            CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as complainant_name,
+            u.id as cu_id
+            FROM users as u
+            LEFT JOIN blotter_reports as br on br.complainant_id = u.id
+            WHERE u.id = br.complainant_id
+        ) as cu on cu.cu_id = br.complainant_id
+        LEFT JOIN
+        ( SELECT
+            CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as admin_name,
+            u.id as cu_id
+            FROM users as u
+            LEFT JOIN blotter_reports as br on br.admin_id = u.id
+            WHERE u.id = br.admin_id
+        ) as au on au.cu_id = br.admin_id
+        ");
+        $blotters = array_map(function($obj) {
+            unset($obj->cu_id);
+            return $obj;
+        },$blotters);
+
+        $total_pages = DB::select("SELECT
+        count(id) as page_count
+        FROM blotter_reports
+        $search_value
+        ORDER BY id
+        ")[0]->page_count;
+        $total_pages = ceil($total_pages/$item_per_page);
+        return response()->json(['data'=>$blotters,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
+        //return response()->json($users,200);
+    }
 }
