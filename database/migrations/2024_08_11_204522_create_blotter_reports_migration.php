@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('blotter_reports_migration', function (Blueprint $table) {
+        Schema::create('blotter_reports', function (Blueprint $table) {
             $table->id();
-            $table->integer('complainee_id');
+            $table->string('complainee_name');
             $table->integer('complainant_id');
             $table->integer('admin_id');
             $table->longText('complaint_file')->nullable();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('blotter_reports_migration');
+        Schema::dropIfExists('blotter_reports');
     }
 };

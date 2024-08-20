@@ -47,22 +47,30 @@ class UserController extends Controller
                 'error' => true
             ],200);
         }
-        DB::statement("INSERT 
-        INTO users
-        (first_name,middle_name,last_name,email,email_verified_at,birthday,cell_number,civil_status_id,male_female)
-        VALUES
-        (
-        '$request->first_name',
-        '$request->middle_name',
-        '$request->last_name',
-        '$request->email',
-        NULL,
-        '$request->birthday',
-        '$request->cell_number',
-        '$request->civil_status_id',
-        '$request->male_female'
-        )
-        ");
+        // Construct the data array dynamically
+        $insertData = [
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'email_verified_at' => NULL,
+            'birthday' => $request->birthday,
+            'cell_number' => $request->cell_number,
+            'civil_status_id' => $request->civil_status_id,
+            'male_female' => $request->male_female,
+        ];
+
+        // Add conditional fields
+        if (!is_null($request->current_address)) {
+            $insertData['current_address'] = $request->current_address;
+        }
+        if (!is_null($request->voter_status)) {
+            $insertData['voter_status'] = $request->voter_status;
+        }
+
+        // Insert and retrieve the ID
+        $user_id = DB::table('users')->insertGetId($insertData);
+        $date_now = date('Y-m-d H:i:s');
         DB::statement("INSERT
         INTO user_roles (user_id,role_id)
         SELECT
@@ -137,6 +145,7 @@ class UserController extends Controller
                 'civil_status_id' => $request->civil_status_id,
                 'male_female' => $request->male_female,
                 'current_address' => $request->current_address,
+                'voter_status' => $request->voter_status,
                 'isPendingResident' => '1'
             ]);
         foreach($request->file_upload as $file) {
@@ -332,6 +341,8 @@ class UserController extends Controller
         u.male_female,
         u.birthday,
         u.cell_number,
+        u.voter_status,
+        u.current_address,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
@@ -398,6 +409,8 @@ class UserController extends Controller
         $update_string .= !is_null($request->cell_number) ? "cell_number = '$request->cell_number'," : '';
         $update_string .= !is_null($request->civil_status_id) ? "civil_status_id = '$request->civil_status_id'," : '';
         $update_string .= !is_null($request->male_female) ? "male_female = '$request->male_female'," : '';
+        $update_string .= !is_null($request->current_address) ? "current_address = '$request->current_address'," : '';
+        $update_string .= !is_null($request->voter_status) ? "voter_status = '$request->voter_status'," : '';
         $update_string = rtrim($update_string, ',');
         $bo_details = DB::SELECT("SELECT
         user_id,
