@@ -334,7 +334,7 @@ class UserController extends Controller
         u.id,
         u.Email,
         u.first_name,
-        u.middle_name,
+        CASE WHEN u.middle_name IS NULL THEN '' ELSE u.middle_name END as middle_name,
         u.last_name,
         u.civil_status_id,
         ct.civil_status_type,
@@ -343,6 +343,13 @@ class UserController extends Controller
         u.cell_number,
         u.voter_status,
         u.current_address,
+        (
+            SELECT
+            GROUP_CONCAT(id)
+            FROM supporting_files
+            WHERE user_id = u.id
+        ) as supporting_file_ids,
+        u.isPendingResident,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
@@ -351,7 +358,6 @@ class UserController extends Controller
         SELECT *
         FROM users
         WHERE id != '$user_id'
-        AND (isPendingResident != '1' OR isPendingResident IS NULL)
         $search_value
         ORDER BY id
         $item_per_page_limit
@@ -366,7 +372,6 @@ class UserController extends Controller
         count(id) as page_count
         FROM users
         WHERE id != '$user_id'
-        AND (isPendingResident != '1' OR isPendingResident IS NULL)
         $search_value
         ORDER BY id
         ")[0]->page_count;
@@ -474,6 +479,10 @@ class UserController extends Controller
         u.male_female,
         u.birthday,
         u.isPendingResident,
+        (SELECT count(br.id) FROM blotter_reports as br 
+            --WHERE br.complainee_name like CONCAT('%', u.first_name, '%') 
+            --AND br.complainee_name like CONCAT('%', u.last_name, '%')
+        ) as name_has_blotter,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
         CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
@@ -484,6 +493,7 @@ class UserController extends Controller
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
         WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
         ");
+        //return $user_details[0];
         if(count($user_details)<1)
         {
             return response()->json([
