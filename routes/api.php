@@ -67,6 +67,7 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('viewNewResidentRequests', [NewResidentController::class, 'viewNewResidentRequests']);
     Route::post('approveNewResident', [NewResidentController::class, 'approveNewResident']);
     Route::post('fileBlotterReport', [BlotterController::class, 'fileBlotterReport']);
+    Route::post('editBlotterReport', [BlotterController::class, 'editBlotterReport']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
