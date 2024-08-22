@@ -13,7 +13,7 @@ class AdminController extends Controller
     public function viewAdminableUsers()
     {
         $adminable_users = DB::select("SELECT
-        CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
         u.id as user_id
         FROM users as u
         LEFT JOIN user_roles as ur on ur.user_id = u.id
@@ -49,7 +49,7 @@ class AdminController extends Controller
         $user_id = session("UserId");
         return DB::select("SELECT
         u.id,
-        CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name
         FROM users as u
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         WHERE ur.role_id IN ('2','3') AND u.id != '$user_id'
@@ -147,7 +147,7 @@ class AdminController extends Controller
         $appointments = DB::select("SELECT
                 apt.id as appointment_id,
                 u.id as user_id,
-                CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+                CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
                 apt.document_type_id,
                 doc_type.service as document_type,
                 apt.schedule_date,

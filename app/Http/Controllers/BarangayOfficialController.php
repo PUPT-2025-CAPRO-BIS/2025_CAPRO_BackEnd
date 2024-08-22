@@ -84,7 +84,7 @@ class BarangayOfficialController extends Controller
         }
         $barangay_officials = DB::select("SELECT
         u.id as user_id,
-        CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
         bo.chairmanship,
         bo.position,
         bo.status

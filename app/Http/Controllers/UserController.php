@@ -58,6 +58,7 @@ class UserController extends Controller
             'cell_number' => $request->cell_number,
             'civil_status_id' => $request->civil_status_id,
             'male_female' => $request->male_female,
+            'isPendingResident' => 0
         ];
 
         // Add conditional fields
@@ -84,10 +85,11 @@ class UserController extends Controller
             foreach($request->file_upload as $file) {
             //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
             //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+            $file = json_decode($file);
             DB::statement("INSERT INTO
             supporting_files
-            (user_id,appointment_id,created_at,base64_file)
-            VALUES('$user_id','0','$date_now','$file')
+            (user_id,appointment_id,created_at,base64_file,file_name)
+            VALUES('$user_id','0','$date_now','$file->data','$file->file_name')
             ");
             }
         }
@@ -151,10 +153,11 @@ class UserController extends Controller
         foreach($request->file_upload as $file) {
             //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
             //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+            $file = json_decode($file);
             DB::statement("INSERT INTO
             supporting_files
-            (user_id,appointment_id,created_at,base64_file)
-            VALUES('$user_id','0','$date_now','$file')
+            (user_id,appointment_id,created_at,base64_file,file_name)
+            VALUES('$user_id','0','$date_now','$file->data','$file->file_name')
             ");
         }
         DB::statement("INSERT
@@ -272,7 +275,7 @@ class UserController extends Controller
             u.first_name,
             u.middle_name,
             u.last_name,
-            CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+            CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
             r.role_type,
             '$current_session_role' as current_session_role
         FROM users as u
@@ -351,7 +354,7 @@ class UserController extends Controller
         ) as supporting_file_ids,
         u.isPendingResident,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
-        CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
         CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
         FROM(
@@ -366,8 +369,12 @@ class UserController extends Controller
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
+        ORDER BY u.isPendingResident DESC
         ");
-
+        foreach($users as $user)
+        {
+            $user->supporting_file_ids = explode(',', $user->supporting_file_ids);
+        }
         $total_pages = DB::select("SELECT
         count(id) as page_count
         FROM users
@@ -480,7 +487,7 @@ class UserController extends Controller
         u.birthday,
         u.isPendingResident,
         DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
-        CONCAT(u.first_name,' ',u.middle_name,' ',u.last_name) as full_name,
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
         CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
         CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
         FROM users as u
@@ -681,7 +688,6 @@ class UserController extends Controller
         //$file = $request->file('file_upload');
         
         // Get the file contents
-        
         $appointment_id = DB::table('appointments')
             ->insertGetId([
                 'document_type_id' => $document_type_id,
@@ -694,10 +700,11 @@ class UserController extends Controller
             foreach($request->file_upload as $file) {
                 //$path = Storage::disk('s3')->put("bis/documents/$user_id", $file);
                 //$fileContents = base64_encode(file_get_contents($file->getRealPath()));
+                $file = json_decode($file);
                 DB::statement("INSERT INTO
                 supporting_files
-                (user_id,appointment_id,created_at,base64_file)
-                VALUES('$user_id','$appointment_id','$date_now','$file')
+                (user_id,appointment_id,created_at,base64_file,file_name)
+                VALUES('$user_id','$appointment_id','$date_now','$file->data','$file->file_name')
                 ");
             }
         // }
