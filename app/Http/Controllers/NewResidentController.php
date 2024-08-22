@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\DynamicMail;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use DateTime;
+use DateTimeZone;
 class NewResidentController extends Controller
 {
     public function viewNewResidentRequests(Request $request)
@@ -138,5 +140,51 @@ class NewResidentController extends Controller
             'msg' => 'New resident has been approved',
             'success' => true
         ]);
+    }
+    public function importExcelResidents(Request $request)
+    {
+        try {
+            $format = 'd/m/Y';
+            $timezone = new DateTimeZone('Asia/Singapore');
+            // Load the uploaded file
+            $file = $request->file('file_upload');
+            $spreadsheet = IOFactory::load($file->getPathname());
+
+            // Get the active sheet
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray();
+            $headers = $data[0];
+            array_shift($data);
+            $object_data = [];
+            foreach($data as $resident)
+            {
+                $entry_object = [];
+                foreach($headers as $index => $header)
+                {
+                    if($header == 'birthday')
+                    {
+                        //return $resident[$index];
+                        $date = DateTime::createFromFormat($format, $resident[$index],$timezone);
+                        $date = $date->format('Y-m-d');
+                        $entry_object[$header] = $date;
+                        
+                    }
+                    else
+                    {
+                        $entry_object[$header] = $resident[$index];
+                    }
+                }
+                $object_data[] = $entry_object;
+            }
+            DB::table('users')
+            ->insert($object_data);
+            return response()->json([
+                'msg' => 'Residents have been imported',
+                'success' => true
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error loading file: ' . $e->getMessage()]);
+        }
     }
 }
