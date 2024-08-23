@@ -109,37 +109,74 @@ class NewResidentController extends Controller
         $total_pages = ceil($total_pages/$item_per_page);
         return response()->json(['data'=>$users,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
     }
-    public function approveNewResident(Request $request)
+    public function editNewResidentStatus(Request $request)
     {
-        $user_details = DB::table('users')
+        $approve_reject = $request->approve_reject;
+        if($approve_reject == 0)
+        {
+            $user_details = DB::table('users')
             ->where('id','=',$request->user_id)
             ->get();
-        if(count($user_details)<1)
-        {
+            if(count($user_details)<1)
+            {
+                return response()->json([
+                    'error_msg' => 'New resident request does not exist',
+                    'error' => true
+                ]);
+            }
+            $first_name = $user_details[0]->first_name;
+            $subject  = 'Your Resident Account Has Been Approved';
+            $content  = "Greetings $first_name, <br><br>";
+            $content .= "Your resident request has been approved. You can now file for an appointment and request your needed document.";
+            DB::table('users')
+                ->where('id','=',$request->user_id)
+                ->update([
+                    'isPendingResident' => 0
+                ]);
+            Mail::to($user_details[0]->email)
+                ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
+                ->send(new DynamicMail([
+                'subject' => $subject,
+                'content' => $content
+            ]));
             return response()->json([
-                'error_msg' => 'New resident request does not exist',
-                'error' => true
+                'msg' => 'New resident has been approved',
+                'success' => true
             ]);
         }
-        $first_name = $user_details[0]->first_name;
-        $subject  = 'Your Resident Account Has Been Approved';
-        $content  = "Greetings $first_name, <br><br>";
-        $content .= "Your resident request has been approved. You can now file for an appointment and request your needed document.";
-        DB::table('users')
+        else
+        {
+            $user_details = DB::table('users')
             ->where('id','=',$request->user_id)
-            ->update([
-                'isPendingResident' => 0
+            ->get();
+            if(count($user_details)<1)
+            {
+                return response()->json([
+                    'error_msg' => 'New resident request does not exist',
+                    'error' => true
+                ]);
+            }
+            $first_name = $user_details[0]->first_name;
+            $subject  = 'Your Resident Account Has Been Denied';
+            $content  = "Greetings $first_name, <br><br>";
+            $content .= "Your resident request has been denied. Please visit the barangay hall to resolve this.";
+            DB::table('users')
+                ->where('id','=',$request->user_id)
+                ->delete();
+            DB::table('supporting_files')
+                ->where('user_id','=',$request->user_id)
+                ->delete();
+            Mail::to($user_details[0]->email)
+                ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
+                ->send(new DynamicMail([
+                'subject' => $subject,
+                'content' => $content
+            ]));
+            return response()->json([
+                'msg' => 'New resident has been denied',
+                'success' => true
             ]);
-        Mail::to($user_details[0]->email)
-            ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
-            ->send(new DynamicMail([
-            'subject' => $subject,
-            'content' => $content
-        ]));
-        return response()->json([
-            'msg' => 'New resident has been approved',
-            'success' => true
-        ]);
+        }
     }
     public function importExcelResidents(Request $request)
     {
