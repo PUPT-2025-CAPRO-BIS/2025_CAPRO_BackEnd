@@ -356,7 +356,7 @@ class UserController extends Controller
                 ) SEPARATOR ','
             ),
             ']'
-        )
+            )   
             FROM supporting_files
             WHERE user_id = u.id
         ) as supporting_files_obj,
@@ -370,14 +370,13 @@ class UserController extends Controller
         FROM users
         WHERE id != '$user_id'
         $search_value
-        ORDER BY id
+        ORDER BY isPendingResident DESC,id ASC
         $item_per_page_limit
         $offset_value
         ) as u
         LEFT JOIN barangay_officials as bo on bo.user_id = u.id
         LEFT JOIN user_roles as ur on ur.user_id = u.id
         LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
-        ORDER BY u.isPendingResident DESC
         ");
         foreach($users as $user)
         {   
@@ -385,6 +384,16 @@ class UserController extends Controller
             if($user->supporting_files_obj)
             {
                 $user->supporting_files_obj = json_decode($user->supporting_files_obj);
+                $array = DB::table('supporting_files')
+                    ->select(
+                        'base64_file'
+                    )
+                    ->where('user_id','=',$user->id)
+                    ->get();
+                foreach($user->supporting_files_obj as $index => $file)
+                {
+                    $file->base64_file = $array[$index]->base64_file;
+                }
             }
             else
             {
