@@ -139,10 +139,32 @@ class AdminController extends Controller
 
     public function viewAppointmentList(Request $request)
     {
+        $item_per_page_limit ="";
+        $item_per_page = "";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "AND (u.first_name like '%$request->search_value%' OR ".
+            "u.middle_name like '%$request->search_value%' OR " .
+            "u.last_name like '%$request->search_value%')";
+        }
         $date_filter = '';
         if($request->schedule_date)
         {
-            $date_filter = "WHERE apt.schedule_date = '$request->schedule_date'";
+            $date_filter = "AND apt.schedule_date = '$request->schedule_date'";
         }
         $appointments = DB::select("SELECT
                 apt.id as appointment_id,
@@ -161,14 +183,30 @@ class AdminController extends Controller
                 FROM appointments as apt
                 LEFT JOIN users as u on u.id = apt.user_id
                 LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+                WHERE apt.id IS NOT NULL
+                $search_value
                 $date_filter
+                ORDER BY apt.id DESC
+                $item_per_page_limit
+                $offset_value
         ");
         foreach($appointments as $appointment)
         {
             $appointment->supporting_file_ids = explode(',', $appointment->supporting_file_ids);
         }
+        $total_pages = DB::select("SELECT
+        count(apt.id) as page_count
+        FROM appointments as apt
+        LEFT JOIN users as u on u.id = apt.user_id
+        LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+        WHERE apt.id IS NOT NULL
+        $search_value
+        $date_filter
+        ORDER BY apt.id DESC
+        ")[0]->page_count;
+        $total_pages = ceil($total_pages/$item_per_page );
         return response()->json([
-            'data' => $appointments,
+            'data' => $appointments,'current_page'=>$page_number,'total_pages'=>$total_pages
         ]);
     }
     public function viewSpecificFile(Request $request)
