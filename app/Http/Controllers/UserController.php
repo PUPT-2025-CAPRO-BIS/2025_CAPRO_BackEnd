@@ -555,7 +555,7 @@ class UserController extends Controller
         VALUES
         ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute))
         ");
-        Mail::to($user_details[0]->email)
+        Mail::to($user_details[0]->Email)
             ->cc('bc00005rc@gmail.com')
             ->send(new OTPEmail([
             'otp' => $otp,

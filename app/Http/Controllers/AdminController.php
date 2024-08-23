@@ -194,8 +194,19 @@ class AdminController extends Controller
         {
             $appointment->supporting_file_ids = explode(',', $appointment->supporting_file_ids);
         }
+        $total_pages = DB::select("SELECT
+        count(apt.id) as page_count
+        FROM appointments as apt
+        LEFT JOIN users as u on u.id = apt.user_id
+        LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+        WHERE apt.id IS NOT NULL
+        $search_value
+        $date_filter
+        ORDER BY apt.id DESC
+        ")[0]->page_count;
+        $total_pages = ceil($total_pages/$item_per_page );
         return response()->json([
-            'data' => $appointments,
+            'data' => $appointments,'current_page'=>$page_number,'total_pages'=>$total_pages
         ]);
     }
     public function viewSpecificFile(Request $request)
