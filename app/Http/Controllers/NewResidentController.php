@@ -193,6 +193,14 @@ class NewResidentController extends Controller
             $headers = $data[0];
             array_shift($data);
             $object_data = [];
+            $existing_emails = explode(',',DB::select("SELECT
+            GROUP_CONCAT(email) as mail
+            FROM users
+            ")[0]->mail);
+            $index_val = array_search('email',$headers);
+            $data = array_filter($data, function($item) use ($existing_emails,$index_val) {
+                return !in_array($item[$index_val], $existing_emails);
+            });
             foreach($data as $resident)
             {
                 $entry_object = [];
