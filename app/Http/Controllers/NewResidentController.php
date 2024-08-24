@@ -134,7 +134,7 @@ class NewResidentController extends Controller
                     'isPendingResident' => 0
                 ]);
             Mail::to($user_details[0]->email)
-                ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
+                ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
                 'content' => $content
@@ -167,7 +167,7 @@ class NewResidentController extends Controller
                 ->where('user_id','=',$request->user_id)
                 ->delete();
             Mail::to($user_details[0]->email)
-                ->cc(['bc00005rc@gmail.com','lianpaulsantos@gmail.com'])
+                ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
                 'content' => $content

@@ -605,7 +605,7 @@ class UserController extends Controller
         $token_value = hash('sha256', $user_id . $email . $current_date_time);
         DB::statement("INSERT
         INTO custom_tokens
-        (user_id,token,session_role_id,expires_at,created_at,updated_at)
+        (user_id,token,session_role_id,expires_at,created_at,updated_at,otp_used)
         VALUES
         (
         '$user_id',
@@ -613,7 +613,8 @@ class UserController extends Controller
         '$role_id',
         date_add('$current_date_time',interval 30 minute),
         '$current_date_time',
-        '$current_date_time'
+        '$current_date_time',
+        '$otp'
         )
         ");
         DB::statement("UPDATE
@@ -696,6 +697,11 @@ class UserController extends Controller
     }
     function createAppointment(Request $request)
     {
+        $api_token = $request->header('Authorization');
+        $new_string = str_replace('Bearer ','',$api_token);
+        $otp_used =  DB::table('custom_tokens')
+            ->where('token','=',$new_string)
+            ->get()[0]->otp_used;
         
         $document_type_id = $request->document_type_id;
         $schedule_date = $request->schedule_date;
@@ -718,7 +724,8 @@ class UserController extends Controller
                 'document_type_id' => $document_type_id,
                 'user_id' => $user_id,
                 'schedule_date' => $schedule_date,
-                'status' => $status
+                'status' => $status,
+                'otp_used' => $otp_used
             ]);
         //if ($request->hasFile('file_upload')) {
         //    foreach ($files as $file) {
@@ -743,7 +750,7 @@ class UserController extends Controller
             ->where('id','=',$user_id)
             ->get();
         Mail::to($user_details[0]->email)
-            ->cc('bc00005rc@gmail.com')
+            ->cc(['bc00005rc@gmail.com'])
             ->send(new CreatedAppointmentMail([
             'schedule_date' => $request->schedule_date,
             'email_address' => $user_details[0]->email,
