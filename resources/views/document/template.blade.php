@@ -475,7 +475,7 @@
                 {!! $title !!}
             </h4>
         </div>
-        <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:100%;text-align:left;padding-left: 15px;padding-right:15px">
+        <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:92%;text-align:left;padding-left: 15px;padding-right:15px">
             {!! $html_code !!}
         </div>
         <div className='flex-column d-flex align-items-end pe-5'

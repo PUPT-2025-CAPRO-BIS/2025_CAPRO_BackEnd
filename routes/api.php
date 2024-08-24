@@ -8,7 +8,7 @@ use App\Http\Controllers\BarangayOfficialController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\NewResidentController;
 use App\Http\Controllers\BlotterController;
-
+use App\Http\Controllers\AppointmentController;
 
 
 /*
@@ -70,9 +70,11 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('editBlotterReport', [BlotterController::class, 'editBlotterReport']);
     Route::post('importExcelResidents', [NewResidentController::class, 'importExcelResidents']);
 
+    Route::post('approveOrRejectAppointment', [AppointmentController::class, 'approveOrRejectAppointment']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
     Route::post('uploadIdPicture', [AdminController::class, 'uploadIdPicture']);
     Route::get('generatePdf', [AdminController::class, 'generatePdf']);
+    Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
     Route::post('applyNewResident', [UserController::class, 'applyNewResident']);
     

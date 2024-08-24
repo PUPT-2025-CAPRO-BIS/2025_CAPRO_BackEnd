@@ -113,10 +113,15 @@ class BlotterController extends Controller
         if($request->search_value)
         {
             $search_value = 
-            "AND (
+            "WHERE
             complainee_name like '%$request->search_value%' OR ".
-            "middle_name like '%$request->search_value%' OR " .
-            "last_name like '%$request->search_value%' OR " .
+            "cu.first_name like '%$request->search_value%' OR ".
+            "cu.middle_name like '%$request->search_value%' OR " .
+            "cu.last_name like '%$request->search_value%' OR" .
+
+            "au.first_name like '%$request->search_value%' OR ".
+            "au.middle_name like '%$request->search_value%' OR " .
+            "au.last_name like '%$request->search_value%'" .
             ")";
         }
 
@@ -127,10 +132,6 @@ class BlotterController extends Controller
         FROM(
         SELECT *
         FROM blotter_reports
-        $search_value
-        ORDER BY id
-        $item_per_page_limit
-        $offset_value
         ) as br
         LEFT JOIN
         ( SELECT
@@ -148,6 +149,10 @@ class BlotterController extends Controller
             LEFT JOIN blotter_reports as br on br.admin_id = u.id
             WHERE u.id = br.admin_id
         ) as au on au.cu_id = br.admin_id
+        $search_value
+        ORDER BY id
+        $item_per_page_limit
+        $offset_value
         ");
         $blotters = array_map(function($obj) {
             unset($obj->cu_id);
