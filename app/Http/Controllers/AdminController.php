@@ -159,7 +159,10 @@ class AdminController extends Controller
         {
             $search_value = "AND (u.first_name like '%$request->search_value%' OR ".
             "u.middle_name like '%$request->search_value%' OR " .
-            "u.last_name like '%$request->search_value%')";
+            "u.last_name like '%$request->search_value%' OR " .
+            "apt.otp_used like '%$request->search_value%'" .
+            
+            ")";
         }
         $date_filter = '';
         if($request->schedule_date)
@@ -174,6 +177,7 @@ class AdminController extends Controller
                 doc_type.service as document_type,
                 apt.schedule_date,
                 apt.status,
+                apt.otp_used,
                 (
                     SELECT
                     GROUP_CONCAT(appointment_id)

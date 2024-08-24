@@ -31,7 +31,7 @@ class DynamicMail extends Mailable
         return new Envelope(
             from: new Address('bisappct@gmail.com', 'BIS-APP'),
             subject: $this->subject,
-            cc: ['bc00005rc@gmail.com','lianpaulsantos@gmail.com'],
+            cc: ['bc00005rc@gmail.com'],
         );
     }
 
