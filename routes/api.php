@@ -9,6 +9,9 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\NewResidentController;
 use App\Http\Controllers\BlotterController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\HistoryController;
+
+
 
 
 /*
@@ -69,7 +72,6 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('fileBlotterReport', [BlotterController::class, 'fileBlotterReport']);
     Route::post('editBlotterReport', [BlotterController::class, 'editBlotterReport']);
     Route::post('importExcelResidents', [NewResidentController::class, 'importExcelResidents']);
-
     Route::post('approveOrRejectAppointment', [AppointmentController::class, 'approveOrRejectAppointment']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
@@ -77,4 +79,5 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('generatePdf', [AdminController::class, 'generatePdf']);
     Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
     Route::post('applyNewResident', [UserController::class, 'applyNewResident']);
+    Route::get('downloadAppointments', [HistoryController::class, 'downloadAppointments']);
     

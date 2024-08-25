@@ -64,6 +64,14 @@ class AppointmentController extends Controller
                 ->update([
                     'status' => 'Released'
                 ]);
+            if(is_null($appointment_deets[0]->updated_at))
+            {
+                DB::table('appointments')
+                ->where('id','=',$request->appointment_id)
+                ->update([
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
             $appointment_deets = $appointment_deets[0];
             $doc = DB::select("SELECT
             *
