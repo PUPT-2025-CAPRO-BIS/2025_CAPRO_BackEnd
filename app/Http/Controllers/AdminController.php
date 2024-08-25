@@ -178,6 +178,10 @@ class AdminController extends Controller
                 apt.schedule_date,
                 apt.status,
                 apt.otp_used,
+                apt.purpose,
+                apt.created_at as request_date,
+                doc_type.price,
+                CASE WHEN apt.updated_at IS NULL THEN '' ELSE apt.updated_at END as release_date,
                 (
                     SELECT
                     GROUP_CONCAT(appointment_id)

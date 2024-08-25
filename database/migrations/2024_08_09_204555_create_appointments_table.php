@@ -17,6 +17,9 @@ return new class extends Migration
             $table->integer('user_id');
             $table->datetime('schedule_date');
             $table->string('status');
+            $table->string('otp_used')->default('');
+            $table->string('purpose')->default('');
+            $table->timestamps();
         });
     }
 
