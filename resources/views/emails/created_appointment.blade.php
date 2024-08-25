@@ -49,7 +49,7 @@
         
         <div class="message">
             <p>Dear {{$first_name}},</p>
-            <p>You have created an appointment scheduled for {{$schedule_date}}.</p>
+            <p>You have created an appointment scheduled for {{$schedule_date}} and your queuing number is {{$queuing_number}}.</p>
             <p>Please make sure to arrive on time and prepare any relevant documents.</p>
         </div>
         
