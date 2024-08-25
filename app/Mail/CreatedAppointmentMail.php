@@ -24,6 +24,7 @@ class CreatedAppointmentMail extends Mailable
         $this->last_name = $data['last_name'];
         $this->email_address = $data['email_address'];
         $this->schedule_date = $data['schedule_date'];
+        $this->schedule_date = $data['queuing_number'];
     }
 
     /**
@@ -51,6 +52,7 @@ class CreatedAppointmentMail extends Mailable
                 'first_name' => $this->first_name,
                 'middle_name' =>$this->middle_name,
                 'last_name' =>$this->last_name,
+                'queuing_number' =>$this->queuing_number,
             ]
         );
     }

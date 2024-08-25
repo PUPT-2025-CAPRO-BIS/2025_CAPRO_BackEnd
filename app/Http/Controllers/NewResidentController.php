@@ -137,7 +137,8 @@ class NewResidentController extends Controller
                 ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
-                'content' => $content
+                'content' => $content,
+                'receiver' => $user_details[0]->email
             ]));
             return response()->json([
                 'msg' => 'New resident has been approved',
@@ -170,7 +171,8 @@ class NewResidentController extends Controller
                 ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
-                'content' => $content
+                'content' => $content,
+                'receiver' => $user_details[0]->email
             ]));
             return response()->json([
                 'msg' => 'New resident has been denied',
