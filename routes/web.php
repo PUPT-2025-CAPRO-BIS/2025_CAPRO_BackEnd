@@ -13,7 +13,7 @@ use App\Http\Controllers\UserController;
 |
 */
 
-/* Route::get('/', function () {
+Route::get('/', function () {
     return view('welcome');
-}); */
-Route::get('/', [UserController::class, 'showViewDoc']);
+});
+//Route::get('/', [UserController::class, 'showViewDoc']);
