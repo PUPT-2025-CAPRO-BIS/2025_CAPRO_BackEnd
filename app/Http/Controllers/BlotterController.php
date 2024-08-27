@@ -130,7 +130,16 @@ class BlotterController extends Controller
 
 
         $blotters = DB::select("SELECT
-        *
+        br.id,
+        br.complainee_name,
+        br.admin_id,
+        br.complainant_id,
+        br.complaint_remarks,
+        br.status_resolved,
+        br.created_at,
+        CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as complainant_name,
+        CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as admin_name
+        
         FROM(
         SELECT *
         FROM blotter_reports

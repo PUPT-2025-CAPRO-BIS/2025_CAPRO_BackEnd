@@ -80,4 +80,4 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
     Route::post('applyNewResident', [UserController::class, 'applyNewResident']);
     Route::get('downloadAppointments', [HistoryController::class, 'downloadAppointments']);
-    
+    Route::get('downloadBlotters', [HistoryController::class, 'downloadBlotters']);
