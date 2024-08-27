@@ -263,7 +263,8 @@ class UserController extends Controller
         ");
         return response()->json([
             'access_token' => $token_value,
-            'success' => true
+            'success' => true,
+            'testPush' => 'hi'
         ],200);
     }
     public function getUserDetails()
