@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('blotter_reports', function (Blueprint $table) {
             $table->id();
             $table->string('complainee_name');
-            $table->integer('complainant_id');
+            $table->string('complainant_name');
             $table->integer('admin_id');
             $table->longText('complaint_file')->nullable();
             $table->text('complaint_remarks');
