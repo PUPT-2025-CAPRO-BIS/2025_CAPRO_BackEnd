@@ -98,7 +98,7 @@ class HistoryController extends Controller
             "WHERE
             complainee_name like '%$request->search_value%' OR ".
 
-            "cu.first_name like '%$request->search_value%' OR ".
+            "complainee_name like '%$request->search_value%' OR ".
             "cu.middle_name like '%$request->search_value%' OR " .
             "cu.last_name like '%$request->search_value%' OR " .
 
@@ -115,13 +115,12 @@ class HistoryController extends Controller
         br.complaint_remarks as Remarks,
         CASE WHEN br.status_resolved = 0 THEN 'Ongoing' ELSE 'Resolved' END as Status,
         br.created_at as 'Requested On',
-        CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as 'Complainant Name',
+        br.complainant_name as Complainant,
         CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as 'Admin Name'
         FROM(
         SELECT *
         FROM blotter_reports
         ) as br
-        LEFT JOIN users as cu on cu.id = br.complainant_id
         LEFT JOIN users as au on au.id = br.admin_id
         $search_value
         ORDER BY br.id

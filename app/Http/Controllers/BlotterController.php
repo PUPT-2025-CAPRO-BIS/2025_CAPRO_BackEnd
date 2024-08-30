@@ -12,24 +12,31 @@ class BlotterController extends Controller
     public function fileBlotterReport(Request $request)
     {
         $complainee_name = $request->complainee_name;
-        $complainant_id = $request->complainant_id;
+        $complainant_name = $request->complainant_name;
         $admin_id = session("UserId");
         
         $complaint_remarks = $request->complaint_remarks;
         //$complaint_file = $request->base64_file;
         $current_date = date('Y-m-d H:i:s');
-        $status_resolved = false;
+        if(!is_null($request->status_resolved))
+        {
+            $status_resolved = false;
+        }
+        else
+        {
+            $status_resolved = $request->status_resolved;
+        }
 
         DB::table('blotter_reports')
             ->insert([
                 'complainee_name' => $complainee_name,
-                'complainant_id' => $complainant_id,
+                'complainant_name' => $complainant_name,
                 'admin_id' => $admin_id,
                 'complaint_remarks' => $complaint_remarks,
                 //'complaint_file' => $complaint_file,
                 'created_at' => $current_date,
                 'updated_at' => $current_date,
-                'status_resolved' => 0
+                'status_resolved' => $status_resolved
             ]);
         return response()->json([
             'msg' => 'A blotter report has been filed',
@@ -41,7 +48,7 @@ class BlotterController extends Controller
         
         $blotter_id = $request->id;
         $complainee_name = $request->complainee_name;
-        $complainant_id = $request->complainant_id;
+        $complainant_name = $request->complainant_name;
         $admin_id = session("UserId");
         
         $complaint_remarks = $request->complaint_remarks;
@@ -52,7 +59,7 @@ class BlotterController extends Controller
             ->where('id','=',$blotter_id)
             ->update([
                 'complainee_name' => $complainee_name,
-                'complainant_id' => $complainant_id,
+                'complainant_name' => $complainant_name,
                 'admin_id' => $admin_id,
                 'complaint_remarks' => $complaint_remarks,
                 'updated_at' => $current_date,
@@ -118,9 +125,7 @@ class BlotterController extends Controller
             "WHERE
             complainee_name like '%$request->search_value%' OR ".
 
-            "cu.first_name like '%$request->search_value%' OR ".
-            "cu.middle_name like '%$request->search_value%' OR " .
-            "cu.last_name like '%$request->search_value%' OR " .
+            "complainant_name like '%$request->search_value%' OR ".
 
             "au.first_name like '%$request->search_value%' OR ".
             "au.middle_name like '%$request->search_value%' OR " .
@@ -137,14 +142,13 @@ class BlotterController extends Controller
         br.complaint_remarks,
         br.status_resolved,
         br.created_at,
-        CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as complainant_name,
+        br.complainant_name,
         CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as admin_name
         
         FROM(
         SELECT *
         FROM blotter_reports
         ) as br
-        LEFT JOIN users as cu on cu.id = br.complainant_id
         LEFT JOIN users as au on au.id = br.admin_id
         $search_value
         ORDER BY br.id
@@ -162,7 +166,6 @@ class BlotterController extends Controller
         SELECT *
         FROM blotter_reports
         ) as br
-        LEFT JOIN users as cu on cu.id = br.complainant_id
         LEFT JOIN users as au on au.id = br.admin_id
         $search_value
         ORDER BY br.id
