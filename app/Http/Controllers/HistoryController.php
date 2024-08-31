@@ -99,8 +99,6 @@ class HistoryController extends Controller
             complainee_name like '%$request->search_value%' OR ".
 
             "complainee_name like '%$request->search_value%' OR ".
-            "cu.middle_name like '%$request->search_value%' OR " .
-            "cu.last_name like '%$request->search_value%' OR " .
 
             "au.first_name like '%$request->search_value%' OR ".
             "au.middle_name like '%$request->search_value%' OR " .
@@ -121,7 +119,7 @@ class HistoryController extends Controller
         SELECT *
         FROM blotter_reports
         ) as br
-        LEFT JOIN users as au on au.id = br.admin_id
+        LEFT JOIN users as cu on cu.id = br.admin_id
         $search_value
         ORDER BY br.id
         ");
