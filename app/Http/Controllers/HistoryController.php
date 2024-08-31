@@ -164,4 +164,100 @@ class HistoryController extends Controller
 
         return $response;
     }
+
+    public function downloadUsers(Request $request)
+    {
+
+        $user_id = session("UserId");
+        /*
+        $item_per_page = $request->item_per_page;
+        $page_number = $request->page_number;
+        $offset = $item_per_page * ($page_number - 1);
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%'";
+        }
+            */
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "AND (first_name like '%$request->search_value%' OR ".
+            "middle_name like '%$request->search_value%' OR " .
+            "last_name like '%$request->search_value%')";
+        }
+
+
+        $dbq = '"';
+        $users = DB::select("SELECT
+        u.id as 'No.',
+        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as 'Name',
+        u.Email as ' Email',
+        ct.civil_status_type as 'Civil Status',
+        CASE WHEN u.male_female = 0 THEN 'Male' ELSE 'Female' END as 'Gender',
+        u.birthday as 'Birthday',
+        u.cell_number as 'Cellphone No.',
+        CASE WHEN u.voter_status = 0 THEN 'No' ELSE 'Yes' END as 'Is Voter?',
+        u.current_address as 'Address',
+        CASE WHEN u.isPendingResident = 0 THEN 'Yes' ELSE 'No' END as 'Is Pending Approval',
+        DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS Age
+        FROM(
+        SELECT *
+        FROM users
+        WHERE id != '$user_id'
+        $search_value
+        ORDER BY isPendingResident DESC,id ASC
+        ) as u
+        LEFT JOIN barangay_officials as bo on bo.user_id = u.id
+        LEFT JOIN user_roles as ur on ur.user_id = u.id
+        LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
+        ");
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        foreach (range('A', 'Z') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        // Set the sheet title
+        $sheet->setTitle('Users Data');
+
+        // Get the headers from the first item in the collection
+        $headers = array_keys(get_object_vars($users[0]));
+        // Populate headers
+        foreach ($headers as $key => $header) {
+            $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+        }
+        // Populate the spreadsheet with the collection data
+        $row = 2; // Starting from the second row (first row for headers)
+        foreach ($users as $user) {
+            $col = 1;
+            foreach ($user as $value) {
+                $sheet->setCellValue([$col, $row], $value);
+                $col++;
+            }
+            $row++;
+        }
+        // Write the file to a temporary location
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = 'Blotter-Reports.xlsx';
+
+        $response = new StreamedResponse(function() use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
+        return $users;
+        //return response()->json($users,200);
+    }
 }

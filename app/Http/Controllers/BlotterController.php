@@ -18,7 +18,7 @@ class BlotterController extends Controller
         $complaint_remarks = $request->complaint_remarks;
         //$complaint_file = $request->base64_file;
         $current_date = date('Y-m-d H:i:s');
-        if(!is_null($request->status_resolved))
+        if(is_null($request->status_resolved))
         {
             $status_resolved = false;
         }
