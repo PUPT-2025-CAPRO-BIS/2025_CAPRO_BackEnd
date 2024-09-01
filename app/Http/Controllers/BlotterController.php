@@ -151,7 +151,7 @@ class BlotterController extends Controller
         ) as br
         LEFT JOIN users as au on au.id = br.admin_id
         $search_value
-        ORDER BY br.id
+        ORDER BY br.id DESC
         $item_per_page_limit
         $offset_value
         ");
@@ -168,7 +168,7 @@ class BlotterController extends Controller
         ) as br
         LEFT JOIN users as au on au.id = br.admin_id
         $search_value
-        ORDER BY br.id
+        ORDER BY br.id DESC
         ")[0]->page_count;
         $total_pages = ceil($total_pages/$item_per_page);
         return response()->json(['data'=>$blotters,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
