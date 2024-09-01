@@ -121,7 +121,7 @@ class HistoryController extends Controller
         ) as br
         LEFT JOIN users as cu on cu.id = br.admin_id
         $search_value
-        ORDER BY br.id
+        ORDER BY br.id DESC
         ");
 
 
@@ -246,7 +246,7 @@ class HistoryController extends Controller
         // Write the file to a temporary location
         $writer = new Xlsx($spreadsheet);
 
-        $fileName = 'Blotter-Reports.xlsx';
+        $fileName = 'User-List.xlsx';
 
         $response = new StreamedResponse(function() use ($writer) {
             $writer->save('php://output');
