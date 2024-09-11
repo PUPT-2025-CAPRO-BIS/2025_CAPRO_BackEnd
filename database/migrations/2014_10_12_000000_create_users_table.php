@@ -23,7 +23,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->integer('isPendingResident')->nullable();
+            $table->integer('isPendingResident')->default(0);
+            $table->boolean('voter_status')->nullable();
+            $table->string('current_address')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
