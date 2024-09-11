@@ -722,6 +722,19 @@ class UserController extends Controller
                 'success' => false
             ],200);
         }
+        $count_schedules = DB::select("SELECT
+        COUNT(id) as count
+        FROM appointments
+        WHERE schedule_date = '$request->schedule_date'
+        ");
+        if($count_schedules[0]->count >= 50)
+        {
+            return response()->json([
+                'error' => true,
+                'error_msg' => 'The slots for your selected date are full. Please select another date.',
+                'success' => false
+            ],200);
+        }
         //$file = $request->file('file_upload');
         
         // Get the file contents
