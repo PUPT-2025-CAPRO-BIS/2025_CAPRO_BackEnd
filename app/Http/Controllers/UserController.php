@@ -161,7 +161,7 @@ class UserController extends Controller
             VALUES('$user_id','0','$date_now','$file->data','$file->file_name')
             ");
         }
-        
+
         DB::statement("INSERT
         INTO user_roles (user_id,role_id)
         SELECT
@@ -306,7 +306,17 @@ class UserController extends Controller
     }
     public function viewAllUsers(Request $request)
     {
-        
+        $isRegisteredFilter = '';
+        if($request->isPendingResident == 1)
+        {
+            $isRegisteredFilter = ' AND u.isPendingResident = 1';
+            $isRegisteredFilter2 = ' AND isPendingResident = 1';
+        }
+        elseif( $request->isPendingResident == 0)
+        {
+            $isRegisteredFilter = ' AND u.isPendingResident = 0';
+            $isRegisteredFilter2 = ' AND isPendingResident = 0';
+        }
         $user_id = session("UserId");
         /*
         $item_per_page = $request->item_per_page;
@@ -389,6 +399,7 @@ class UserController extends Controller
         FROM users
         WHERE id != '$user_id'
         $search_value
+        $isRegisteredFilter2
         ORDER BY isPendingResident DESC,id ASC
         $item_per_page_limit
         $offset_value
@@ -421,8 +432,9 @@ class UserController extends Controller
         }
         $total_pages = DB::select("SELECT
         count(id) as page_count
-        FROM users
-        WHERE id != '$user_id'
+        FROM users as u
+        WHERE u.id != '$user_id'
+        $isRegisteredFilter
         $search_value
         ORDER BY id
         ")[0]->page_count;

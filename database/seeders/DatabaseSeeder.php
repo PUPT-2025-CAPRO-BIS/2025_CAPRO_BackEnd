@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'user_id' => 1,
             'role_id' => 3
         ]);
+        /*
         for ($x = 0; $x <= 10; $x++) {
         $user_id = DB::table('users')->insertGetId([
             'first_name' => fake()->firstName(),
@@ -65,6 +66,7 @@ class DatabaseSeeder extends Seeder
                     'role_type' => 'super_admin'
                 ]
             ]);
+            */
     }
 
     function generateRandomBirthday()

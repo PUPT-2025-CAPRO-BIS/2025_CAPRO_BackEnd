@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('user_id');
             $table->text('appointment_id');
             $table->longText('base64_file')->nullable();
+            $table->string('file_name')->nullable();
             $table->timestamp('created_at');
         });
     }
