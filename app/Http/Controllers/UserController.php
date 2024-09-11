@@ -307,12 +307,13 @@ class UserController extends Controller
     public function viewAllUsers(Request $request)
     {
         $isRegisteredFilter = '';
-        if($request->isPendingResident == 1)
+        $isRegisteredFilter2 = '';
+        if($request->isPendingResident == '1')
         {
             $isRegisteredFilter = ' AND u.isPendingResident = 1';
             $isRegisteredFilter2 = ' AND isPendingResident = 1';
         }
-        elseif( $request->isPendingResident == 0)
+        else if( $request->isPendingResident == '0')
         {
             $isRegisteredFilter = ' AND u.isPendingResident = 0';
             $isRegisteredFilter2 = ' AND isPendingResident = 0';
