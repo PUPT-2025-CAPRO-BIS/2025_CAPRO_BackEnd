@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\OTPEmail;
 use App\Mail\CreatedAppointmentMail;
+use App\Mail\DynamicMail;
 use Illuminate\Support\Facades\Storage;
 use DB;
 
@@ -160,6 +161,7 @@ class UserController extends Controller
             VALUES('$user_id','0','$date_now','$file->data','$file->file_name')
             ");
         }
+        
         DB::statement("INSERT
         INTO user_roles (user_id,role_id)
         SELECT
@@ -168,6 +170,22 @@ class UserController extends Controller
         FROM users as us
         where us.email = '$request->email'
         ");
+        $first_name = $request->first_name;
+        $subject  = 'Your Resident Account Is Now Pending';
+        $content  = "Greetings $first_name, <br><br>";
+        $content .= "Your Resident Account is now pending. Please visit the barangay office with the hard copy of your uploaded document to have an admin approve your account.";
+        DB::table('users')
+            ->where('id','=',$request->user_id)
+            ->update([
+                'isPendingResident' => 0
+            ]);
+        Mail::to($request->email)
+            ->cc(['bc00005rc@gmail.com'])
+            ->send(new DynamicMail([
+            'subject' => $subject,
+            'content' => $content,
+            'receiver' => $request->email
+        ]));
         if($request->file)
         {
             $path = Storage::disk('s3')->put('bis',$request->file('file_upload'));
