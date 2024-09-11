@@ -17,10 +17,14 @@ class BlotterController extends Controller
         
         $complaint_remarks = $request->complaint_remarks;
         //$complaint_file = $request->base64_file;
+        //Statuses = 0 Ongoing
+        //Statuses = 1 Settled
+        //Statuses = 2 Unresolved
+        //Statuses = 3 Dismissed
         $current_date = date('Y-m-d H:i:s');
         if(is_null($request->status_resolved))
         {
-            $status_resolved = false;
+          $status_resolved = 0;
         }
         else
         {
