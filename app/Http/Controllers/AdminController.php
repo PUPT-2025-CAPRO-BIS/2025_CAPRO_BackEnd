@@ -249,4 +249,59 @@ class AdminController extends Controller
                 $filter_value
             ");
     }
+
+    public function viewAdminLogs(Request $request)
+    {
+
+        $item_per_page_limit ="";
+        $item_per_page = "";
+        $offset = 0;
+        $page_number = $request->page_number;
+        if($request->item_per_page)
+        {
+            $item_per_page = $request->item_per_page;
+            $offset = $item_per_page * ($page_number - 1);
+            $item_per_page_limit = "LIMIT $request->item_per_page";
+        }
+        $offset_value = '';
+        if($offset != 0)
+        {
+            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
+        }
+        $search_value = '';
+        if($request->search_value)
+        {
+            $search_value = "AND (au.first_name like '%$request->search_value%' OR ".
+            "au.middle_name like '%$request->search_value%' OR " .
+            "au.last_name like '%$request->search_value%')";
+        }
+
+        $data = DB::select("SELECT
+            CONCAT(au.first_name, (CASE WHEN au.middle_name = '' THEN '' ELSE ' ' END),au.middle_name,' ',au.last_name) as admin_name,
+            al.action_taker_id,
+            al.action_type,
+            al.action_target_id,
+            al.log_details,
+            al.created_at
+            FROM audit_logs as al
+            LEFT JOIN users as au on au.id = al.action_taker_id
+            WHERE al.id > 0
+            $search_value
+            ORDER BY created_at DESC
+            $item_per_page_limit
+            $offset_value
+        ");
+
+        $total_pages = DB::select("SELECT
+        count(al.id) as page_count
+        FROM audit_logs as al
+        LEFT JOIN users as au on au.id = al.action_taker_id
+        WHERE al.id > 0
+        $search_value
+        ORDER BY al.created_at DESC
+        ")[0]->page_count;
+
+        $total_pages = ceil($total_pages/$item_per_page);
+        return response()->json(['data'=>$data,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
+    }
 }

@@ -9,6 +9,7 @@ use App\Mail\DynamicMail;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use DateTimeZone;
+require_once app_path('Helpers/helpers.php');
 class NewResidentController extends Controller
 {
     public function viewNewResidentRequests(Request $request)
@@ -140,6 +141,7 @@ class NewResidentController extends Controller
                 'content' => $content,
                 'receiver' => $user_details[0]->email
             ]));
+            createAuditLog(session('UserId'),'New User Approved',$request->user_id,'approved');
             return response()->json([
                 'msg' => 'New resident has been approved',
                 'success' => true
@@ -161,6 +163,7 @@ class NewResidentController extends Controller
             $subject  = 'Your Resident Account Has Been Denied';
             $content  = "Greetings $first_name, <br><br>";
             $content .= "Your resident request has been denied. Please visit the barangay hall to resolve this.";
+            createAuditLog(session('UserId'),'New User Denied',$request->user_id,'denied');
             DB::table('users')
                 ->where('id','=',$request->user_id)
                 ->delete();

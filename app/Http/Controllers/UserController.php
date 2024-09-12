@@ -11,6 +11,7 @@ use App\Mail\OTPEmail;
 use App\Mail\CreatedAppointmentMail;
 use App\Mail\DynamicMail;
 use Illuminate\Support\Facades\Storage;
+require_once app_path('Helpers/helpers.php');
 use DB;
 
 class UserController extends Controller
@@ -72,6 +73,7 @@ class UserController extends Controller
 
         // Insert and retrieve the ID
         $user_id = DB::table('users')->insertGetId($insertData);
+        createAuditLog(session('UserId'),'User Details Added',$user_id,'added');
         $date_now = date('Y-m-d H:i:s');
         DB::statement("INSERT
         INTO user_roles (user_id,role_id)
@@ -494,6 +496,7 @@ class UserController extends Controller
         $update_string
         WHERE id = '$user_id'
         ");
+        createAuditLog(session('UserId'),'User Details Updated',$request->id,'updated');
         return response()->json([
             'msg' => 'Resident official record has been changed',
             'success' => true
@@ -517,6 +520,7 @@ class UserController extends Controller
         FROM users
         WHERE id = '$user_id'
         ");
+        createAuditLog(session('UserId'),'User Details Deleted',$request->id,'deleted');
         return response()->json([
             'msg' => 'User information has been deleted',
             'success' => true
