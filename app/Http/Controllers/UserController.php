@@ -370,6 +370,7 @@ class UserController extends Controller
         CASE WHEN u.middle_name IS NULL THEN '' ELSE u.middle_name END as middle_name,
         u.last_name,
         u.civil_status_id,
+        (SELECT COUNT(id) FROM appointments WHERE user_id = u.id ) as appointments_made,
         ct.civil_status_type,
         u.male_female,
         u.birthday,
