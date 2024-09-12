@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use DateTime;
 use Barryvdh\DomPDF\Facade\Pdf;
+require_once app_path('Helpers/helpers.php');
 class AppointmentController extends Controller
 {
     public function approveOrRejectAppointment(Request $request)
@@ -27,6 +28,8 @@ class AppointmentController extends Controller
             ->update([
                 'status' => $status
             ]);
+        $status_string = $request->approve_reject  == 0 ? 'Approved' : 'Rejected';
+        createAuditLog(session('UserId'), 'Appointment ' . $status_string ,$request->appointment_id,strtolower($status_string));
         return response()->json([
             'msg' => "Appointment Has Been $status",
             'success' => true 
@@ -64,6 +67,7 @@ class AppointmentController extends Controller
                 ->update([
                     'status' => 'Released'
                 ]);
+            createAuditLog(session('UserId'), 'Appointment Released' ,$request->appointment_id,'released');
             if(is_null($appointment_deets[0]->updated_at))
             {
                 DB::table('appointments')
