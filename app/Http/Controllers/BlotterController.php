@@ -21,7 +21,8 @@ class BlotterController extends Controller
         }
         $complainee_name = !$request->complainee_name || $request->complainee_name == '' ? null : $request->complainee_name;
         $complainee_id = !$request->complainee_id || $request->complainee_id == '' ? null : $request->complainee_id;
-        $complainant_name = $request->complainant_name;
+        $complainant_name = !$request->complainant_name || $request->complainant_name == '' ? null : $request->complainant_name;
+        $complainant_id = !$request->complainant_id || $request->complainant_id == '' ? null : $request->complainant_id;
         $admin_id = session("UserId");
         
         $complaint_remarks = $request->complaint_remarks;
@@ -44,13 +45,15 @@ class BlotterController extends Controller
             ->insert([
                 'complainee_name' => $complainee_name,
                 'complainant_name' => $complainant_name,
+                'complainant_id' => $complainant_id,
                 'admin_id' => $admin_id,
                 'complainee_id' => $complainee_id,
                 'complaint_remarks' => $complaint_remarks,
                 //'complaint_file' => $complaint_file,
                 'created_at' => $current_date,
                 'updated_at' => $current_date,
-                'status_resolved' => $status_resolved
+                'status_resolved' => $status_resolved,
+                'officer_on_duty' => $request->officer_on_duty
             ]);
         return response()->json([
             'msg' => 'A blotter report has been filed',
@@ -70,7 +73,8 @@ class BlotterController extends Controller
         $blotter_id = $request->id;
         $complainee_name = !$request->complainee_name || $request->complainee_name == '' ? null : $request->complainee_name;
         $complainee_id = !$request->complainee_id || $request->complainee_id == '' ? null : $request->complainee_id;
-        $complainant_name = $request->complainant_name;
+        $complainant_name = !$request->complainant_name || $request->complainant_name == '' ? null : $request->complainant_name;
+        $complainant_id = !$request->complainant_id || $request->complainant_id == '' ? null : $request->complainant_id;
         $admin_id = session("UserId");
         
         $complaint_remarks = $request->complaint_remarks;
@@ -82,11 +86,13 @@ class BlotterController extends Controller
             ->update([
                 'complainee_name' => $complainee_name,
                 'complainant_name' => $complainant_name,
+                'complainant_id' => $complainant_id,
                 'complainee_id' => $complainee_id,
                 'admin_id' => $admin_id,
                 'complaint_remarks' => $complaint_remarks,
                 'updated_at' => $current_date,
-                'status_resolved' => $status_resolved
+                'status_resolved' => $status_resolved,
+                'officer_on_duty' => $request->officer_on_duty
             ]);
             /*
         if($request->base64_file)
@@ -160,15 +166,17 @@ class BlotterController extends Controller
         $blotters = DB::select("SELECT
         br.id,
         CASE WHEN br.complainee_name IS NULL THEN CONCAT(ceu.first_name, (CASE WHEN ceu.middle_name = '' THEN '' ELSE ' ' END),ceu.middle_name,' ',ceu.last_name) ELSE br.complainee_name END as complainee_name,
+        CASE WHEN br.complainant_name IS NULL THEN CONCAT(cau.first_name, (CASE WHEN cau.middle_name = '' THEN '' ELSE ' ' END),cau.middle_name,' ',cau.last_name) ELSE br.complainant_name END as complainant_name,
         br.complainee_id,
+        br.complainant_id,
         br.admin_id,
-        br.complainant_name,
         br.complaint_remarks,
         br.status_resolved,
         br.created_at,
-        br.complainant_name,
         CONCAT(au.first_name, (CASE WHEN au.middle_name = '' THEN '' ELSE ' ' END),au.middle_name,' ',au.last_name) as admin_name,
-        CASE WHEN br.complainee_id IS NULL THEN 0 ELSE 1 END as is_complainee_resident
+        br.officer_on_duty,
+        CASE WHEN br.complainee_id IS NULL THEN 0 ELSE 1 END as is_complainee_resident,
+        CASE WHEN br.complainant_id IS NULL THEN 0 ELSE 1 END as is_complainant_resident
         
         FROM(
         SELECT *
@@ -176,6 +184,7 @@ class BlotterController extends Controller
         ) as br
         LEFT JOIN users as au on au.id = br.admin_id
         LEFT JOIN users as ceu on ceu.id = br.complainee_id
+        LEFT JOIN users as cau on cau.id = br.complainant_id
         $search_value
         ORDER BY br.id DESC
         $item_per_page_limit

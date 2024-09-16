@@ -587,8 +587,10 @@ class UserController extends Controller
         }
         $user_first_name = $user_details[0]->first_name;
         $user_last_name = $user_details[0]->last_name;
+        $user_id = $user_details[0]->id;
         $blotter_info = DB::table('blotter_reports')
-            ->whereRaw("complainee_name like '%$user_first_name%' AND complainee_name like '%$user_last_name%' AND status_resolved IN ('0','2')")
+            //->whereRaw("complainee_name like '%$user_first_name%' AND complainee_name like '%$user_last_name%' AND status_resolved IN ('0','2')")
+            ->whereRaw("complainee_id = '$user_id'")
             ->get();
         if(count($blotter_info) > 0)
         {
