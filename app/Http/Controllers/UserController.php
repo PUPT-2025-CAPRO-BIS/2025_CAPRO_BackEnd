@@ -311,6 +311,25 @@ class UserController extends Controller
     {
         $isRegisteredFilter = '';
         $isRegisteredFilter2 = '';
+        if($request->blotter_view == 1)
+        {
+            $search_value = '';
+            !!$request->search_value ? $search_value = " WHERE CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name)
+                like '%$request->search_value%'" : '';
+            $users = DB::select("SELECT
+                u.id as user_id,
+                CONCAT(
+                u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name,
+                ' | ',
+                DATE_FORMAT(u.birthday, '%Y-%m-%d'),
+                ' | ',
+                u.email
+                ) as user
+                FROM users as u
+                $search_value
+            ");
+            return $users;
+        }
         if($request->isPendingResident == '1')
         {
             $isRegisteredFilter = ' AND u.isPendingResident = 1';
