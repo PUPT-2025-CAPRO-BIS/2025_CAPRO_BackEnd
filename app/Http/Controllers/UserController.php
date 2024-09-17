@@ -585,6 +585,40 @@ class UserController extends Controller
                 'error_msg' => 'A user with this email and birthday does not exist'
             ]);
         }
+        if($request->changePassword == '1')
+        {
+            if($user_details[0]->assignable_admin == 1)
+            {
+                return response()->json([
+                    'error_msg' => 'User is not an admin',
+                    'error' => true,
+                    'success' => false
+                ]);
+            }
+            $first_name = $user_details[0]->first_name;
+            $otp = $this->generateOTPString(6);
+            $user_id = $user_details[0]->id;
+            DB::statement("INSERT INTO
+            otps
+            (otp,user_id,status,expires_at,change_password)
+            VALUES
+            ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute),1)
+            ");
+            $subject  = 'Here is your change password OTP';
+            $content  = "Greetings $first_name, <br><br>";
+            $content .= "Your OTP to change your password is $otp . Please do not share this with anyone else.";
+            Mail::to($user_details[0]->Email)
+                ->cc(['bc00005rc@gmail.com'])
+                ->send(new DynamicMail([
+                'subject' => $subject,
+                'content' => $content,
+                'receiver' => $user_details[0]->Email
+            ]));
+            return response()->json([
+                'success' => true,
+                'msg' => 'OTP has been sent to email'
+            ]);
+        }
         $user_first_name = $user_details[0]->first_name;
         $user_last_name = $user_details[0]->last_name;
         $user_id = $user_details[0]->id;

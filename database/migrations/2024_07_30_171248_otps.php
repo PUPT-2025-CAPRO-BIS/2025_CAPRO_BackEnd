@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('status');
             $table->timestamp('expires_at')->nullable();
+            $table->boolean('change_password')->default(0);
             $table->timestamps();
 
         });
