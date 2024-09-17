@@ -536,11 +536,11 @@ class UserController extends Controller
                 'success' => false
             ],401);
         }
+        createAuditLog(session('UserId'),'User Details Deleted',$request->user_id,'deleted');
         DB::statement("DELETE
         FROM users
         WHERE id = '$user_id'
         ");
-        createAuditLog(session('UserId'),'User Details Deleted',$request->id,'deleted');
         return response()->json([
             'msg' => 'User information has been deleted',
             'success' => true

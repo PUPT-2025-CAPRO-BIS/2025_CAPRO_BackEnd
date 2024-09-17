@@ -76,10 +76,10 @@ class AdminController extends Controller
         sum(CASE WHEN male_female = '1' THEN 1 ELSE 0 END) as females,
         sum(CASE WHEN (DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday )), '%Y') + 0) >= 60 THEN 1 ELSE 0 END ) as count_of_seniors,
         (SELECT count(id) FROM appointments) as schedules,
-        0 as unresolved,
-        0 as ongoing,
-        0 as settled,
-        0 as dismissed
+        (SELECT count(id) FROM blotters WHERE status_resolved = 0) as ongoing,
+        (SELECT count(id) FROM blotters WHERE status_resolved = 1) as settled,
+        (SELECT count(id) FROM blotters WHERE status_resolved = 2) as unresolved,
+        (SELECT count(id) FROM blotters WHERE status_resolved = 3) as dismissed
         FROM users
         ");
         return $view;
