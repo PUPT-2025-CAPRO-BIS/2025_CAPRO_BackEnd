@@ -156,9 +156,16 @@ class BlotterController extends Controller
 
             "complainant_name like '%$request->search_value%' OR ".
 
-            "au.first_name like '%$request->search_value%' OR ".
-            "au.middle_name like '%$request->search_value%' OR " .
-            "au.last_name like '%$request->search_value%'" ;
+            "ceu.first_name like '%$request->search_value%' OR ".
+            "ceu.middle_name like '%$request->search_value%' OR " .
+            "ceu.last_name like '%$request->search_value%' OR " .
+
+            "cau.first_name like '%$request->search_value%' OR ".
+            "cau.middle_name like '%$request->search_value%' OR " .
+            "cau.last_name like '%$request->search_value%' OR " .
+
+            "br.complainee_name like '%$request->search_value%' OR ".
+            "br.complainant_name like '%$request->search_value%'";
         }
 
 
@@ -202,6 +209,8 @@ class BlotterController extends Controller
         FROM blotter_reports
         ) as br
         LEFT JOIN users as au on au.id = br.admin_id
+        LEFT JOIN users as ceu on ceu.id = br.complainee_id
+        LEFT JOIN users as cau on cau.id = br.complainant_id
         $search_value
         ORDER BY br.id DESC
         ")[0]->page_count;
