@@ -274,7 +274,7 @@ class AdminController extends Controller
         {
             $search_value = "AND (au.first_name like '%$request->search_value%' OR ".
             "au.middle_name like '%$request->search_value%' OR " .
-            "au.last_name like '%$request->search_value%')";
+            "au.last_name like '%$request->search_value%' OR al.log_details like '%$request->search_value%')";
         }
 
         $data = DB::select("SELECT
