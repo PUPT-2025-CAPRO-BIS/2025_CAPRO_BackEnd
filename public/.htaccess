@@ -20,6 +20,6 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
-     # Send Requests To API Front Controller...
-     RewriteRule ^app/.*$ /api/index.php [L]
+    # Send Requests To API Front Controller...
+    RewriteRule ^app/.*$ /api/index.php [L]
 </IfModule>
