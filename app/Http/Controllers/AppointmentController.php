@@ -90,6 +90,10 @@ class AppointmentController extends Controller
             $user_deets = DB::table('users')
                 ->where('id','=',$appointment_deets->user_id)
                 ->get()[0];
+            $user_civil_status_type = DB::table('civil_status_types')
+                ->where('id',$user_deets->civil_status_id)
+                ->get()[0]->civil_status_type;
+                $user_deets->civil_status = $user_civil_status_type;
             $params = [];
             foreach($user_deets as $field => $value)
             {

@@ -70,6 +70,10 @@ class AdminController extends Controller
     }
     public function dashboardView()
     {
+        //Statuses = 0 Ongoing
+        //Statuses = 1 Settled
+        //Statuses = 2 Unresolved
+        //Statuses = 3 Dismissed
         $view = DB::select("SELECT
         count(id) as count_of_residents,
         sum(CASE WHEN male_female = '0' THEN 1 ELSE 0 END) as males,
@@ -250,7 +254,6 @@ class AdminController extends Controller
                 $filter_value
             ");
     }
-
     public function viewAdminLogs(Request $request)
     {
 
@@ -302,7 +305,7 @@ class AdminController extends Controller
         $search_value
         ORDER BY al.created_at DESC, al.id DESC
         ")[0]->page_count;
-
+        
         $total_pages = ceil($total_pages/$item_per_page);
         return response()->json(['data'=>$data,'current_page'=>$page_number,'total_pages'=>$total_pages],200);
     }

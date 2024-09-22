@@ -73,7 +73,7 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('editBlotterReport', [BlotterController::class, 'editBlotterReport']);
     Route::post('importExcelResidents', [NewResidentController::class, 'importExcelResidents']);
     Route::post('approveOrRejectAppointment', [AppointmentController::class, 'approveOrRejectAppointment']);
-    Route::post('noVerificationRegistration', [UserController::class, 'noVerificationRegistration']);
+    Route::post('noVerificationRegistration', [UserController::class, 'noVerificationRegistration']); //addbearer
     Route::get('viewAdminLogs', [AdminController::class, 'viewAdminLogs']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);
@@ -84,3 +84,4 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('downloadBlotters', [HistoryController::class, 'downloadBlotters']);
     Route::get('downloadUsers', [HistoryController::class, 'downloadUsers']);
     Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
+    

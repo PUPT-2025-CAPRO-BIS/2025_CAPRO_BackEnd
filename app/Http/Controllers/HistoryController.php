@@ -10,7 +10,6 @@ use DB;
 
 class HistoryController extends Controller
 {
-    
     public function downloadAppointments(Request $request)
     {
         $search_value = '';
@@ -105,6 +104,8 @@ class HistoryController extends Controller
             "au.last_name like '%$request->search_value%'" ;
         }
 
+
+
         $blotters = DB::select("SELECT
         br.id as 'No.',
         CASE WHEN br.complainee_name IS NULL THEN CONCAT(ceu.first_name, (CASE WHEN ceu.middle_name = '' THEN '' ELSE ' ' END),ceu.middle_name,' ',ceu.last_name) ELSE br.complainee_name END as Complainee,
@@ -116,13 +117,16 @@ class HistoryController extends Controller
         WHEN br.status_resolved = 3 THEN 'Dismissed'
         END as Status,
         br.created_at as 'Requested On',
-         CASE WHEN br.complainant_name IS NULL THEN CONCAT(cau.first_name, (CASE WHEN cau.middle_name = '' THEN '' ELSE ' ' END),cau.middle_name,' ',cau.last_name) ELSE br.complainant_name END as Complainant,
+        CASE WHEN br.complainant_name IS NULL THEN CONCAT(cau.first_name, (CASE WHEN cau.middle_name = '' THEN '' ELSE ' ' END),cau.middle_name,' ',cau.last_name) ELSE br.complainant_name END as Complainant,
         CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as 'Admin Name'
+
         FROM(
         SELECT *
         FROM blotter_reports
         ) as br
         LEFT JOIN users as cu on cu.id = br.admin_id
+        LEFT JOIN users as ceu on ceu.id = br.complainee_id
+        LEFT JOIN users as cau on cau.id = br.complainant_id
         $search_value
         ORDER BY br.id DESC
         ");
@@ -154,7 +158,7 @@ class HistoryController extends Controller
         }
         // Write the file to a temporary location
         $writer = new Xlsx($spreadsheet);
-
+        
         $fileName = 'Blotter-Reports.xlsx';
 
         $response = new StreamedResponse(function() use ($writer) {
@@ -167,14 +171,14 @@ class HistoryController extends Controller
 
         return $response;
     }
-
     public function downloadUsers(Request $request)
     {
-
+        
         $user_id = session("UserId");
         /*
         $item_per_page = $request->item_per_page;
         $page_number = $request->page_number;
+
         $offset = $item_per_page * ($page_number - 1);
         $offset_value = '';
         if($offset != 0)
@@ -248,7 +252,7 @@ class HistoryController extends Controller
         }
         // Write the file to a temporary location
         $writer = new Xlsx($spreadsheet);
-
+        
         $fileName = 'User-List.xlsx';
 
         $response = new StreamedResponse(function() use ($writer) {

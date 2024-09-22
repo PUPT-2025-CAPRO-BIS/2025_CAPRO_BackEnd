@@ -36,6 +36,7 @@ class DocumentController extends Controller
         VALUES ('$service','$description')
         ");
         */
+        createAuditLog(session('UserId'),'Document Type Added',$doc_id,'added');
         return response()->json([
             'msg' => 'New document type added',
             'success' => true
@@ -116,7 +117,7 @@ class DocumentController extends Controller
                     'description' => $request->description
                 ]);
         }
-        createAuditLog(session('UserId'),'Document Type Updated',$request->doc_id,'updated');   
+        createAuditLog(session('UserId'),'Document Type Updated',$request->doc_id,'updated');
         return response()->json([
             'msg' => 'Document edited',
             'success' => true
