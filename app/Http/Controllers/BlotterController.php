@@ -24,7 +24,6 @@ class BlotterController extends Controller
         $complainant_name = !$request->complainant_name || $request->complainant_name == '' ? null : $request->complainant_name;
         $complainant_id = !$request->complainant_id || $request->complainant_id == '' ? null : $request->complainant_id;
         $admin_id = session("UserId");
-        
         $complaint_remarks = $request->complaint_remarks;
         //$complaint_file = $request->base64_file;
         //Statuses = 0 Ongoing
@@ -34,7 +33,7 @@ class BlotterController extends Controller
         $current_date = date('Y-m-d H:i:s');
         if(is_null($request->status_resolved))
         {
-          $status_resolved = 0;
+            $status_resolved = 0;
         }
         else
         {
@@ -159,7 +158,7 @@ class BlotterController extends Controller
             "ceu.first_name like '%$request->search_value%' OR ".
             "ceu.middle_name like '%$request->search_value%' OR " .
             "ceu.last_name like '%$request->search_value%' OR " .
-
+            
             "cau.first_name like '%$request->search_value%' OR ".
             "cau.middle_name like '%$request->search_value%' OR " .
             "cau.last_name like '%$request->search_value%' OR " .
@@ -184,7 +183,7 @@ class BlotterController extends Controller
         br.officer_on_duty,
         CASE WHEN br.complainee_id IS NULL THEN 0 ELSE 1 END as is_complainee_resident,
         CASE WHEN br.complainant_id IS NULL THEN 0 ELSE 1 END as is_complainant_resident
-        
+
         FROM(
         SELECT *
         FROM blotter_reports
