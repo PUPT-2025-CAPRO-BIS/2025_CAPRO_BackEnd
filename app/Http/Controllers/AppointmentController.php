@@ -105,6 +105,11 @@ class AppointmentController extends Controller
                         $format = 'F d, Y';
                         $value = $value->format($format);
                     }
+                    if($field == 'male_female')
+                    {
+                        $field = 'gender';
+                        $value = $value == 0 ? 'male' : 'female';
+                    }
                     $description = str_replace('$' . $field, $value, $description);
                 }
             }
