@@ -556,28 +556,54 @@ class UserController extends Controller
     public function generateOTP(Request $request)
     {
         $current_date_time = date('Y-m-d H:i:s');
-
-        $user_details = DB::select("SELECT
-        u.id,
-        u.Email,
-        u.first_name,
-        u.middle_name,
-        u.last_name,
-        u.civil_status_id,
-        ct.civil_status_type,
-        u.male_female,
-        u.birthday,
-        u.isPendingResident,
-        DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
-        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
-        CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
-        CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
-        FROM users as u
-        LEFT JOIN barangay_officials as bo on bo.user_id = u.id
-        LEFT JOIN user_roles as ur on ur.user_id = u.id
-        LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
-        WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
-        ");
+        if($request->birthday != '' || !is_null($request->birthday))
+        {
+            $user_details = DB::select("SELECT
+            u.id,
+            u.Email,
+            u.first_name,
+            u.middle_name,
+            u.last_name,
+            u.civil_status_id,
+            ct.civil_status_type,
+            u.male_female,
+            u.birthday,
+            u.isPendingResident,
+            DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
+            CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
+            CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
+            CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
+            FROM users as u
+            LEFT JOIN barangay_officials as bo on bo.user_id = u.id
+            LEFT JOIN user_roles as ur on ur.user_id = u.id
+            LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
+            WHERE u.email = '$request->email' AND u.birthday = '$request->birthday'
+            ");
+        }
+        else
+        {
+            $user_details = DB::select("SELECT
+            u.id,
+            u.Email,
+            u.first_name,
+            u.middle_name,
+            u.last_name,
+            u.civil_status_id,
+            ct.civil_status_type,
+            u.male_female,
+            u.birthday,
+            u.isPendingResident,
+            DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
+            CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
+            CASE WHEN bo.id IS NOT NULL THEN 0 ELSE 1 END as assignable_brgy_official,
+            CASE WHEN ur.role_id IN ('2','3') THEN 0 ELSE 1 END as assignable_admin
+            FROM users as u
+            LEFT JOIN barangay_officials as bo on bo.user_id = u.id
+            LEFT JOIN user_roles as ur on ur.user_id = u.id
+            LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
+            WHERE u.email = '$request->email'
+            ");
+        }
         if(count($user_details)<1)
         {
             return response()->json([
@@ -585,7 +611,7 @@ class UserController extends Controller
                 'error_msg' => 'A user with this email and birthday does not exist'
             ]);
         }
-        if($request->changePassword == '1')
+        if($request->change_password == '1')
         {
             if($user_details[0]->assignable_admin == 1)
             {
