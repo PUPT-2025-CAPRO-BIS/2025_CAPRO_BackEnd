@@ -67,6 +67,8 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('assignBarangayOfficial', [BarangayOfficialController::class, 'assignBarangayOfficial']);
     Route::get('viewAllUsers', [UserController::class, 'viewAllUsers']);
     Route::get('dashboardView', [AdminController::class, 'dashboardView']);
+    Route::get('viewResidents', [AdminController::class, 'viewResidents']);
+    Route::get('getBlotterReports', [AdminController::class, 'getBlotterReports']);
     Route::get('viewNewResidentRequests', [NewResidentController::class, 'viewNewResidentRequests']);
     Route::post('editNewResidentStatus', [NewResidentController::class, 'editNewResidentStatus']);
     Route::post('fileBlotterReport', [BlotterController::class, 'fileBlotterReport']);
