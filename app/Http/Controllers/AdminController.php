@@ -70,19 +70,103 @@ class AdminController extends Controller
     }
     public function dashboardView()
     {
+        //Statuses = 0 Ongoing
+        //Statuses = 1 Settled
+        //Statuses = 2 Unresolved
+        //Statuses = 3 Dismissed
         $view = DB::select("SELECT
         count(id) as count_of_residents,
         sum(CASE WHEN male_female = '0' THEN 1 ELSE 0 END) as males,
         sum(CASE WHEN male_female = '1' THEN 1 ELSE 0 END) as females,
         sum(CASE WHEN (DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday )), '%Y') + 0) >= 60 THEN 1 ELSE 0 END ) as count_of_seniors,
-        0 as schedules,
-        0 as unresolved,
-        0 as ongoing,
-        0 as settled,
-        0 as dismissed
+        (SELECT count(id) FROM appointments) as schedules,
+        (SELECT count(id) FROM blotter_reports WHERE status_resolved = 0) as ongoing,
+        (SELECT count(id) FROM blotter_reports WHERE status_resolved = 1) as settled,
+        (SELECT count(id) FROM blotter_reports WHERE status_resolved = 2) as unresolved,
+        (SELECT count(id) FROM blotter_reports WHERE status_resolved = 3) as dismissed
         FROM users
+        WHERE isPendingResident = 0
         ");
         return $view;
+    }
+    public function viewResidents(Request $request)
+    {
+        // Initialize filters
+        $genderFilter = '';
+        $ageFilter = '';
+
+        // Gender filtering
+        if ($request->gender) {
+            // Assuming '0' for male and '1' for female
+            $genderFilter = "AND u.male_female = '" . ($request->gender == 'male' ? '0' : '1') . "'";
+        }
+
+        // Filter for seniors (age >= 60)
+        if ($request->seniors) {
+            $ageFilter = "AND (DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0) >= 60";
+        }
+
+        // Run the query
+        $residents = DB::select("
+            SELECT 
+                u.id,
+                u.first_name,
+                CASE WHEN u.middle_name IS NULL THEN '' ELSE u.middle_name END as middle_name,
+                u.last_name,
+                u.email,
+                u.birthday,
+                u.male_female,
+                DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS age,
+                CONCAT(u.first_name, ' ', u.middle_name, ' ', u.last_name) as full_name
+            FROM users as u
+            WHERE 1=1
+            $genderFilter
+            $ageFilter
+            ORDER BY u.id ASC
+        ");
+
+        // Return the filtered residents in JSON format
+        return response()->json($residents);
+    }
+    public function getBlotterReports(Request $request)
+    {
+        $status = $request->query('status');
+
+        // Initialize the query
+        $query = DB::table('blotter_reports as br')
+            ->leftJoin('users as complainee_user', 'br.complainee_id', '=', 'complainee_user.id')
+            ->leftJoin('users as complainant_user', 'br.complainant_id', '=', 'complainant_user.id')
+            ->select(
+                'br.id',
+                DB::raw('COALESCE(br.complainee_name, CONCAT(complainee_user.first_name, " ", complainee_user.last_name)) as complainee_name'),
+                DB::raw('COALESCE(br.complainant_name, CONCAT(complainant_user.first_name, " ", complainant_user.last_name)) as complainant_name'),
+                'br.complainee_id',
+                'br.complainant_id',
+                'br.admin_id',
+                'br.complaint_file',
+                'br.officer_on_duty',
+                'br.complaint_remarks',
+                'br.status_resolved',
+                'br.created_at',
+                'br.updated_at'
+            );
+
+        // Apply status filter if needed
+        if ($status === 'unresolved') {
+            $query->where('status_resolved', 2);  // Unresolved
+        } elseif ($status === 'ongoing') {
+            $query->where('status_resolved', 0);  // Ongoing
+        } elseif ($status === 'settled') {
+            $query->where('status_resolved', 1);  // Settled
+        } elseif ($status === 'dismissed') {
+            $query->where('status_resolved', 3);  // Dismissed
+        }
+
+        // Get the results
+        $blotterReports = $query->get();
+
+        // Return the data in JSON format
+        return response()->json($blotterReports);
     }
     public function uploadIdPicture(Request $request)
     {
