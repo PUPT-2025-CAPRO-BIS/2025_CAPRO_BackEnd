@@ -16,20 +16,28 @@ class HistoryController extends Controller
         if($request->search_value)
         {
             $search_value = "AND (u.first_name like '%$request->search_value%' OR ".
-            "u.middle_name like '%$request->search_value%' OR " .
-            "u.last_name like '%$request->search_value%' OR " .
-            "apt.otp_used like '%$request->search_value%'" .
-            
-            ")";
+                "u.middle_name like '%$request->search_value%' OR " .
+                "u.last_name like '%$request->search_value%' OR " .
+                "apt.otp_used like '%$request->search_value%'" .
+                ")";
         }
+
         $date_filter = '';
-        if($request->schedule_date)
-        {
+        // Check if both from_date and to_date are provided
+        if ($request->from_date && $request->to_date) {
+            $from_date = $request->from_date;
+            $to_date = $request->to_date;
+            $date_filter = "AND apt.schedule_date BETWEEN '$from_date' AND '$to_date'";
+        } 
+        // If only schedule_date is provided (legacy filter)
+        elseif ($request->schedule_date) {
             $date_filter = "AND apt.schedule_date = '$request->schedule_date'";
         }
+
+        // Fetch appointments with filters
         $appointments = DB::select("SELECT
                 apt.id as 'No.',
-                CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as 'Name',
+                CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END), u.middle_name, ' ', u.last_name) as 'Name',
                 doc_type.service as 'Document Type',
                 apt.schedule_date as 'Scheduled Date',
                 apt.status,
@@ -46,23 +54,24 @@ class HistoryController extends Controller
                 ORDER BY apt.id DESC
         ");
 
-
+        // Create and populate spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         foreach (range('A', 'Z') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
-        // Set the sheet title
-        $sheet->setTitle('Users Data');
+        $sheet->setTitle('Appointments Data');
 
-        // Get the headers from the first item in the collection
-        $headers = array_keys(get_object_vars($appointments[0]));
-        // Populate headers
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+        // Set headers
+        if (count($appointments) > 0) {
+            $headers = array_keys(get_object_vars($appointments[0]));
+            foreach ($headers as $key => $header) {
+                $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+            }
         }
-        // Populate the spreadsheet with the collection data
-        $row = 2; // Starting from the second row (first row for headers)
+
+        // Populate rows with appointment data
+        $row = 2;
         foreach ($appointments as $appointment) {
             $col = 1;
             foreach ($appointment as $value) {
@@ -71,9 +80,9 @@ class HistoryController extends Controller
             }
             $row++;
         }
-        // Write the file to a temporary location
+
+        // Prepare Excel file for download
         $writer = new Xlsx($spreadsheet);
-        
         $fileName = 'Appointments.xlsx';
 
         $response = new StreamedResponse(function() use ($writer) {
@@ -86,6 +95,7 @@ class HistoryController extends Controller
 
         return $response;
     }
+
     public function downloadBlotters(Request $request)
     {
         $user_id = session("UserId");
