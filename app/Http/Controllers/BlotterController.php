@@ -221,7 +221,6 @@ class BlotterController extends Controller
 
     public function downloadBlotterPDF(Request $request)
     {
-        // Fetch the blotter details from the 'blotter_reports' table
         $blotter_details = DB::table('blotter_reports')
             ->where('id', $request->blotter_id)
             ->first();
@@ -230,75 +229,57 @@ class BlotterController extends Controller
             return response()->json(['error' => 'Blotter not found'], 404);
         }
 
-        // Initialize default values for phone and address
         $complainant_name = $blotter_details->complainant_name ?? 'N/A';
         $complainant_address = 'N/A';
-        $complainant_phone = 'N/A';
+        $complainant_phone = $blotter_details->complainant_phone_number ?? 'N/A'; 
         $complainee_name = $blotter_details->complainee_name ?? 'N/A';
         $complainee_address = 'N/A';
-        $complainee_phone = 'N/A';
+        $complainee_phone = $blotter_details->complainee_phone_number ?? 'N/A'; 
 
-        // Fetch complainant details from the 'users' table if complainant_id exists
         if ($blotter_details->complainant_id) {
             $complainant = DB::table('users')
                 ->where('id', $blotter_details->complainant_id)
-                ->select('first_name', 'middle_name', 'last_name', 'current_address', 'cell_number')
+                ->select('current_address')
                 ->first();
 
             if ($complainant) {
-                // Construct full name if available
-                $complainant_name = trim("{$complainant->first_name} {$complainant->middle_name} {$complainant->last_name}");
                 $complainant_address = $complainant->current_address ?? 'N/A';
-                $complainant_phone = $complainant->cell_number ?? 'N/A';
             }
         }
 
-        // Fetch complainee details from the 'users' table if complainee_id exists
         if ($blotter_details->complainee_id) {
             $complainee = DB::table('users')
                 ->where('id', $blotter_details->complainee_id)
-                ->select('first_name', 'middle_name', 'last_name', 'current_address', 'cell_number')
+                ->select('current_address')
                 ->first();
 
             if ($complainee) {
-                // Construct full name if available
-                $complainee_name = trim("{$complainee->first_name} {$complainee->middle_name} {$complainee->last_name}");
                 $complainee_address = $complainee->current_address ?? 'N/A';
-                $complainee_phone = $complainee->cell_number ?? 'N/A';
             }
         }
 
-        // If complainant_id or complainee_id is NULL, use non-resident fields for phone and address
         if (!$blotter_details->complainant_id) {
-            $complainant_name = $blotter_details->complainant_name ?? 'N/A';
             $complainant_address = $blotter_details->non_resident_address ?? 'N/A';
-            $complainant_phone = $blotter_details->non_resident_phone ?? 'N/A';
         }
 
         if (!$blotter_details->complainee_id) {
-            $complainee_name = $blotter_details->complainee_name ?? 'N/A';
             $complainee_address = $blotter_details->non_resident_address ?? 'N/A';
-            $complainee_phone = $blotter_details->non_resident_phone ?? 'N/A';
         }
 
-        // Prepare the data to pass to the Blade view
         $data = [
             'title' => 'Blotter Report',
             'blotter_details' => $blotter_details,
             'complainant_name' => $complainant_name,
             'complainant_address' => $complainant_address,
-            'complainant_phone' => $complainant_phone,
+            'complainant_phone' => $complainant_phone, 
             'complainee_name' => $complainee_name,
             'complainee_address' => $complainee_address,
-            'complainee_phone' => $complainee_phone
+            'complainee_phone' => $complainee_phone  
         ];
 
-        // Load the view and generate the PDF
         $pdf = PDF::loadView('document.blotter', $data);
         $pdf->setPaper('A4', 'portrait');
 
-        // Return the PDF for download or streaming
         return $request->download == 1 ? $pdf->download('blotter_report.pdf') : $pdf->stream('blotter_report.pdf');
     }
-
 }
