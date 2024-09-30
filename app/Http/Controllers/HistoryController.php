@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 use DB;
 
 class HistoryController extends Controller
@@ -95,81 +97,113 @@ class HistoryController extends Controller
 
         return $response;
     }
-
     public function downloadBlotters(Request $request)
     {
         $user_id = session("UserId");
-        $offset = 0;
+
+        // Initialize filters
         $search_value = '';
-        if($request->search_value)
-        {
-            $search_value = 
-            "WHERE
-            complainee_name like '%$request->search_value%' OR ".
+        $category_filter = '';
+        $date_filter = '';
 
-            "complainee_name like '%$request->search_value%' OR ".
-
-            "au.first_name like '%$request->search_value%' OR ".
-            "au.middle_name like '%$request->search_value%' OR " .
-            "au.last_name like '%$request->search_value%'" ;
+        // Search filter
+        if ($request->search_value) {
+            $search_value = "AND (br.complainee_name LIKE '%$request->search_value%' OR ".
+                            "br.complainant_name LIKE '%$request->search_value%' OR ".
+                            "au.first_name LIKE '%$request->search_value%' OR ".
+                            "au.middle_name LIKE '%$request->search_value%' OR ".
+                            "au.last_name LIKE '%$request->search_value%')";
         }
 
+        // Date range filter
+        if ($request->from_date && $request->to_date) {
+            $from_date = $request->from_date . ' 00:00:00';  // Ensure start of the day
+            $to_date = $request->to_date . ' 23:59:59';      // Ensure end of the day
+            $date_filter = "AND br.created_at BETWEEN '$from_date' AND '$to_date'";
+        }
 
+        // Category filter (handle NULL values in category)
+        if ($request->category) {
+            $category = $request->category;
+            $category_filter = "AND (br.category = '$category' OR br.category IS NULL)";
+        }
 
-        $blotters = DB::select("SELECT
-        br.id as 'No.',
-        CASE WHEN br.complainee_name IS NULL THEN CONCAT(ceu.first_name, (CASE WHEN ceu.middle_name = '' THEN '' ELSE ' ' END),ceu.middle_name,' ',ceu.last_name) ELSE br.complainee_name END as Complainee,
-        br.complaint_remarks as Remarks,
-        CASE 
-        WHEN br.status_resolved = 0 THEN 'Ongoing'
-        WHEN br.status_resolved = 1 THEN 'Settled'
-        WHEN br.status_resolved = 2 THEN 'Unresolved'
-        WHEN br.status_resolved = 3 THEN 'Dismissed'
-        END as Status,
-        br.created_at as 'Requested On',
-        CASE WHEN br.complainant_name IS NULL THEN CONCAT(cau.first_name, (CASE WHEN cau.middle_name = '' THEN '' ELSE ' ' END),cau.middle_name,' ',cau.last_name) ELSE br.complainant_name END as Complainant,
-        CONCAT(cu.first_name, (CASE WHEN cu.middle_name = '' THEN '' ELSE ' ' END),cu.middle_name,' ',cu.last_name) as 'Admin Name'
-
-        FROM(
-        SELECT *
-        FROM blotter_reports
-        ) as br
-        LEFT JOIN users as cu on cu.id = br.admin_id
-        LEFT JOIN users as ceu on ceu.id = br.complainee_id
-        LEFT JOIN users as cau on cau.id = br.complainant_id
-        $search_value
-        ORDER BY br.id DESC
+        // Execute the query with dynamic filters, including category
+        $blotters = DB::select("
+            SELECT
+                br.id AS 'No.',
+                CASE 
+                    WHEN br.complainee_name IS NULL 
+                    THEN CONCAT(ceu.first_name, ' ', ceu.middle_name, ' ', ceu.last_name) 
+                    ELSE br.complainee_name 
+                END AS Complainee,
+                br.complaint_remarks AS Remarks,
+                CASE 
+                    WHEN br.status_resolved = 0 THEN 'Ongoing'
+                    WHEN br.status_resolved = 1 THEN 'Settled'
+                    WHEN br.status_resolved = 2 THEN 'Unresolved'
+                    WHEN br.status_resolved = 3 THEN 'Dismissed'
+                END AS Status,
+                br.created_at AS 'Requested On',
+                CASE 
+                    WHEN br.complainant_name IS NULL 
+                    THEN CONCAT(cau.first_name, ' ', cau.middle_name, ' ', cau.last_name) 
+                    ELSE br.complainant_name 
+                END AS Complainant,
+                CONCAT(cu.first_name, ' ', cu.middle_name, ' ', cu.last_name) AS 'Admin Name',
+                br.category AS Category
+            FROM blotter_reports AS br
+            LEFT JOIN users AS cu ON cu.id = br.admin_id
+            LEFT JOIN users AS ceu ON ceu.id = br.complainee_id
+            LEFT JOIN users AS cau ON cau.id = br.complainant_id
+            WHERE br.id IS NOT NULL
+            $search_value
+            $date_filter
+            $category_filter
+            ORDER BY br.id DESC
         ");
 
+        // If no blotters found, return a message (for debugging)
+        if (empty($blotters)) {
+            return response()->json(['message' => 'No blotters found for the given criteria'], 404);
+        }
 
+        // Create and populate spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        
+        // Adjust columns to auto-size
         foreach (range('A', 'Z') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
-        // Set the sheet title
-        $sheet->setTitle('Users Data');
 
-        // Get the headers from the first item in the collection
-        $headers = array_keys(get_object_vars($blotters[0]));
-        // Populate headers
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+        $sheet->setTitle('Blotters Data');
+
+        // Set headers, including the 'Category' column
+        if (count($blotters) > 0) {
+            $headers = array_keys(get_object_vars($blotters[0]));
+            foreach ($headers as $key => $header) {
+                // Convert numeric index to Excel-style column (A, B, C, ...)
+                $column = Coordinate::stringFromColumnIndex($key + 1);
+                $sheet->setCellValue($column . '1', ucfirst($header));  // Add 'Category' as a header
+            }
         }
-        // Populate the spreadsheet with the collection data
-        $row = 2; // Starting from the second row (first row for headers)
+
+        // Populate rows with blotter data, including the 'Category' column
+        $row = 2; // Starting from the second row
         foreach ($blotters as $blotter) {
             $col = 1;
             foreach ($blotter as $value) {
-                $sheet->setCellValue([$col, $row], $value);
+                $column = Coordinate::stringFromColumnIndex($col);
+                $sheet->setCellValue($column . $row, $value);
                 $col++;
             }
             $row++;
         }
-        // Write the file to a temporary location
+
+        // Prepare Excel file for download
         $writer = new Xlsx($spreadsheet);
-        
-        $fileName = 'Blotter-Reports.xlsx';
+        $fileName = 'Blotters-Reports.xlsx';
 
         $response = new StreamedResponse(function() use ($writer) {
             $writer->save('php://output');

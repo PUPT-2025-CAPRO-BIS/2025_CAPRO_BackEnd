@@ -223,41 +223,49 @@ class AdminController extends Controller
 
     public function viewAppointmentList(Request $request)
     {
-        $item_per_page_limit ="";
+        $item_per_page_limit = "";
         $item_per_page = "";
         $offset = 0;
         $page_number = $request->page_number;
-        if($request->item_per_page)
-        {
+        
+        if ($request->item_per_page) {
             $item_per_page = $request->item_per_page;
             $offset = $item_per_page * ($page_number - 1);
             $item_per_page_limit = "LIMIT $request->item_per_page";
         }
+        
         $offset_value = '';
-        if($offset != 0)
-        {
+        if ($offset != 0) {
             $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
         }
+
+        // Search Filter
         $search_value = '';
-        if($request->search_value)
-        {
-            $search_value = "AND (u.first_name like '%$request->search_value%' OR ".
-            "u.middle_name like '%$request->search_value%' OR " .
-            "u.last_name like '%$request->search_value%' OR " .
-            "apt.id = '$request->search_value' OR " .
-            "apt.otp_used like '%$request->search_value%'" .
-            
-            ")";
+        if ($request->search_value) {
+            $search_value = "AND (u.first_name like '%$request->search_value%' OR " .
+                "u.middle_name like '%$request->search_value%' OR " .
+                "u.last_name like '%$request->search_value%' OR " .
+                "apt.id = '$request->search_value' OR " .
+                "apt.otp_used like '%$request->search_value%'" .
+                ")";
         }
+
+        // Date Filter (from_date and to_date)
         $date_filter = '';
-        if($request->schedule_date)
-        {
+        if ($request->from_date && $request->to_date) {
+            $from_date = $request->from_date;
+            $to_date = $request->to_date;
+            $date_filter = "AND apt.schedule_date BETWEEN '$from_date' AND '$to_date'";
+        } elseif ($request->schedule_date) {
+            // Single Date Filter (legacy support)
             $date_filter = "AND apt.schedule_date = '$request->schedule_date'";
         }
+
+        // Fetching the filtered appointments
         $appointments = DB::select("SELECT
                 apt.id as appointment_id,
                 u.id as user_id,
-                CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
+                CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END), u.middle_name, ' ', u.last_name) as full_name,
                 apt.document_type_id,
                 doc_type.service as document_type,
                 apt.schedule_date,
@@ -272,36 +280,43 @@ class AdminController extends Controller
                     GROUP_CONCAT(appointment_id)
                     FROM supporting_files
                     WHERE appointment_id = apt.id
-                    ) as supporting_file_ids
-                FROM appointments as apt
-                LEFT JOIN users as u on u.id = apt.user_id
-                LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
-                WHERE apt.id IS NOT NULL
-                $search_value
-                $date_filter
-                ORDER BY apt.id DESC
-                $item_per_page_limit
-                $offset_value
+                ) as supporting_file_ids
+            FROM appointments as apt
+            LEFT JOIN users as u on u.id = apt.user_id
+            LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+            WHERE apt.id IS NOT NULL
+            $search_value
+            $date_filter
+            ORDER BY apt.id DESC
+            $item_per_page_limit
+            $offset_value
         ");
-        foreach($appointments as $appointment)
-        {
+
+        foreach ($appointments as $appointment) {
             $appointment->supporting_file_ids = explode(',', $appointment->supporting_file_ids);
         }
+
+        // Fetch total pages
         $total_pages = DB::select("SELECT
-        count(apt.id) as page_count
-        FROM appointments as apt
-        LEFT JOIN users as u on u.id = apt.user_id
-        LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
-        WHERE apt.id IS NOT NULL
-        $search_value
-        $date_filter
-        ORDER BY apt.id DESC
+            count(apt.id) as page_count
+            FROM appointments as apt
+            LEFT JOIN users as u on u.id = apt.user_id
+            LEFT JOIN document_types as doc_type on doc_type.id = apt.document_type_id
+            WHERE apt.id IS NOT NULL
+            $search_value
+            $date_filter
+            ORDER BY apt.id DESC
         ")[0]->page_count;
-        $total_pages = ceil($total_pages/$item_per_page );
+
+        $total_pages = ceil($total_pages / $item_per_page);
+
         return response()->json([
-            'data' => $appointments,'current_page'=>$page_number,'total_pages'=>$total_pages
+            'data' => $appointments,
+            'current_page' => $page_number,
+            'total_pages' => $total_pages
         ]);
     }
+
     public function viewSpecificFile(Request $request)
     {
         return DB::select("SELECT base64_file FROM supporting_files WHERE id = $request->supporting_file_id")[0]->base64_file;
