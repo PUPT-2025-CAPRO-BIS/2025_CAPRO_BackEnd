@@ -12,6 +12,7 @@ class BlotterController extends Controller
 {
     public function fileBlotterReport(Request $request)
     {
+      
         if(!!$request->complainee_name && !!$request->complainee_id)
         {
             return response()->json([
@@ -26,6 +27,7 @@ class BlotterController extends Controller
         $complainant_id = !$request->complainant_id || $request->complainant_id == '' ? null : $request->complainant_id;
         $admin_id = session("UserId");
         $complaint_remarks = $request->complaint_remarks;
+        $category = !$request->category || $request->category == '' ? null : $request->category;
         //$complaint_file = $request->base64_file;
         //Statuses = 0 Ongoing
         //Statuses = 1 Settled
@@ -41,6 +43,11 @@ class BlotterController extends Controller
             $status_resolved = $request->status_resolved;
         }
 
+        $complainant_phone_number = !$request->complainant_phone_number || $request->complainant_phone_number == '' ? null : $request->complainant_phone_number;
+        $complainee_phone_number = !$request->complainee_phone_number || $request->complainee_phone_number == '' ? null : $request->complainee_phone_number;
+
+        $non_resident_address = $request->non_resident_address ?? null;
+
         DB::table('blotter_reports')
             ->insert([
                 'complainee_name' => $complainee_name,
@@ -53,13 +60,18 @@ class BlotterController extends Controller
                 'created_at' => $current_date,
                 'updated_at' => $current_date,
                 'status_resolved' => $status_resolved,
-                'officer_on_duty' => $request->officer_on_duty
+                'officer_on_duty' => $request->officer_on_duty,
+                'category' => $category,
+                'complainant_phone_number' => $complainant_phone_number,
+                'complainee_phone_number' => $complainee_phone_number,
+                'non_resident_address' => $non_resident_address,
             ]);
         return response()->json([
             'msg' => 'A blotter report has been filed',
             'success' => true
         ]);
     }
+
     public function editBlotterReport(Request $request)
     {
         if(!!$request->complainee_name && !!$request->complainee_id)
@@ -76,10 +88,17 @@ class BlotterController extends Controller
         $complainant_name = !$request->complainant_name || $request->complainant_name == '' ? null : $request->complainant_name;
         $complainant_id = !$request->complainant_id || $request->complainant_id == '' ? null : $request->complainant_id;
         $admin_id = session("UserId");
+
+        $category = !$request->category || $request->category == '' ? null : $request->category;
         
         $complaint_remarks = $request->complaint_remarks;
         $current_date = date('Y-m-d H:i:s');
         $status_resolved = $request->status_resolved;
+
+        $complainant_phone_number = !$request->complainant_phone_number || $request->complainant_phone_number == '' ? null : $request->complainant_phone_number;
+        $complainee_phone_number = !$request->complainee_phone_number || $request->complainee_phone_number == '' ? null : $request->complainee_phone_number;
+
+        $non_resident_address = $request->non_resident_address ?? null;
 
         DB::table('blotter_reports')
             ->where('id','=',$blotter_id)
@@ -92,7 +111,11 @@ class BlotterController extends Controller
                 'complaint_remarks' => $complaint_remarks,
                 'updated_at' => $current_date,
                 'status_resolved' => $status_resolved,
-                'officer_on_duty' => $request->officer_on_duty
+                'officer_on_duty' => $request->officer_on_duty,
+                'category' => $category,
+                'complainant_phone_number' => $complainant_phone_number,
+                'complainee_phone_number' => $complainee_phone_number,
+                'non_resident_address' => $non_resident_address,
             ]);
             /*
         if($request->base64_file)
@@ -184,8 +207,12 @@ class BlotterController extends Controller
             br.complaint_remarks,
             br.status_resolved,
             br.created_at,
+            br.category,
             CONCAT(au.first_name, (CASE WHEN au.middle_name = '' THEN '' ELSE ' ' END), au.middle_name, ' ', au.last_name) as admin_name,
             br.officer_on_duty,
+            br.complainee_phone_number,
+            br.complainant_phone_number,
+            br.non_resident_address,
             CASE WHEN br.complainee_id IS NULL THEN 0 ELSE 1 END as is_complainee_resident,
             CASE WHEN br.complainant_id IS NULL THEN 0 ELSE 1 END as is_complainant_resident
 
