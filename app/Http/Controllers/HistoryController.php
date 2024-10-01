@@ -122,10 +122,16 @@ class HistoryController extends Controller
             $date_filter = "AND br.created_at BETWEEN '$from_date' AND '$to_date'";
         }
 
-        // Category filter (handle NULL values in category)
+        // Category filter
         if ($request->category) {
             $category = $request->category;
-            $category_filter = "AND (br.category = '$category' OR br.category IS NULL)";
+
+            // If "Others" is selected, get entries not matching specified categories
+            if ($category === "Others") {
+                $category_filter = "AND br.category NOT IN ('Noise', 'Theft', 'Test')";
+            } else {
+                $category_filter = "AND br.category = '$category'";
+            }
         }
 
         // Execute the query with dynamic filters, including category
