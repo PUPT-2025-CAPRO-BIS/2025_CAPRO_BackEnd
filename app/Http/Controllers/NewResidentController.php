@@ -187,7 +187,7 @@ class NewResidentController extends Controller
     {
         try {
             $format = 'm/d/Y';
-            $timezone = new DateTimeZone('Asia/Singapore');
+            $timezone = new DateTimeZone('Asia/Manila');
             // Load the uploaded file
             $file = $request->file('file_upload');
             $spreadsheet = IOFactory::load($file->getPathname());
@@ -196,6 +196,17 @@ class NewResidentController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $data = $sheet->toArray();
             $headers = $data[0];
+            $header_empty = 0;
+            $header_count = 0;
+            foreach($headers as $header)
+            {
+                if($header == '')
+                {
+                    break;
+                }
+                $header_count++;
+            }
+            $headers = array_slice($headers, 0, $header_count);
             array_shift($data);
             $object_data = [];
             $existing_emails = explode(',',DB::select("SELECT
@@ -206,14 +217,29 @@ class NewResidentController extends Controller
             $data = array_filter($data, function($item) use ($existing_emails,$index_val) {
                 return !in_array($item[$index_val], $existing_emails);
             });
+            $count = 0;
+            $break_check = 0;
             foreach($data as $resident)
             {
+                $header_break = 0;
+                if($break_check == 1)
+                {
+                    break;
+                }
                 $entry_object = [];
                 foreach($headers as $index => $header)
                 {
+                    if($resident[$index] == '')
+                    {
+                        $break_check = 1;
+                    }
+                    if($break_check == 1)
+                    {
+                        break;
+                    }
+
                     if($header == 'birthday')
                     {
-                        //return $resident[$index];
                         $date = DateTime::createFromFormat($format, $resident[$index],$timezone);
                         $date = $date->format('Y-m-d');
                         $entry_object[$header] = $date;
@@ -224,7 +250,12 @@ class NewResidentController extends Controller
                         $entry_object[$header] = $resident[$index];
                     }
                 }
+                if($break_check == 1)
+                {
+                    break;
+                }
                 $object_data[] = $entry_object;
+                $count++;
             }
             DB::table('users')
             ->insert($object_data);
