@@ -186,7 +186,7 @@ class NewResidentController extends Controller
     public function importExcelResidents(Request $request)
     {
         try {
-            $format = 'd/m/Y';
+            $format = 'm/d/Y';
             $timezone = new DateTimeZone('Asia/Singapore');
             // Load the uploaded file
             $file = $request->file('file_upload');
