@@ -311,6 +311,20 @@ class UserController extends Controller
     {
         $isRegisteredFilter = '';
         $isRegisteredFilter2 = '';
+        $dashboard_filter= $request->dashboard_filter;
+        $dashboard_clause = '';
+        if($dashboard_filter == 'female')
+        {
+            $dashboard_clause = "AND male_female = 1";
+        }
+        if($dashboard_filter == 'male')
+        {
+            $dashboard_clause = "AND male_female = 0";
+        }
+        if($dashboard_filter == 'senior')
+        {
+            $dashboard_clause = "AND birthday <= DATE_SUB(CURDATE(), INTERVAL 60 YEAR)";
+        }
         if($request->blotter_view == 1)
         {
             $search_value = '';
@@ -424,6 +438,7 @@ class UserController extends Controller
         WHERE id != '$user_id'
         $search_value
         $isRegisteredFilter2
+        $dashboard_clause
         ORDER BY isPendingResident DESC,id ASC
         $item_per_page_limit
         $offset_value
@@ -460,6 +475,7 @@ class UserController extends Controller
         WHERE u.id != '$user_id'
         $isRegisteredFilter
         $search_value
+        $dashboard_clause
         ORDER BY id
         ")[0]->page_count;
 
