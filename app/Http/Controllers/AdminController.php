@@ -80,7 +80,7 @@ class AdminController extends Controller
         sum(CASE WHEN male_female = '1' AND isPendingResident = 1 THEN 1 ELSE 0 END) as females,
         sum(CASE WHEN isPendingResident = 1 THEN 1 ELSE 0 END ) as pending_resident,
         sum(CASE WHEN isPendingResident = 0 THEN 1 ELSE 0 END ) as non_pending_resident,
-        sum(CASE WHEN (DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday )), '%Y') + 0) >= 60 AND isPendingResident = 1 THEN 1 ELSE 0 END ) as count_of_seniors,
+        sum(CASE WHEN (DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday )), '%Y') + 0) >= 60 AND isPendingResident = 0 THEN 1 ELSE 0 END ) as count_of_seniors,
         (SELECT count(id) FROM appointments) as schedules,
         (SELECT count(id) FROM blotter_reports WHERE status_resolved = 0) as ongoing,
         (SELECT count(id) FROM blotter_reports WHERE status_resolved = 1) as settled,
