@@ -665,15 +665,21 @@ class UserController extends Controller
         $user_last_name = $user_details[0]->last_name;
         $user_id = $user_details[0]->id;
         $blotter_info = DB::table('blotter_reports')
+            ->select('category', 'status_resolved')
             ->whereRaw("status_resolved IN ('0','2')")
             ->whereRaw("complainee_id = '$user_id'")
             ->get();
         if(count($blotter_info) > 0)
         {
-            return response()->json([
-                'error' => true,
-                'error_msg'=> 'There is currently a blotter report with your name, please go to the barangay to resolve this.'
-            ]);
+          $category = $blotter_info->first()->category;
+          $status_resolved = $blotter_info->first()->status_resolved;
+
+          $status_text = $status_resolved == '0' ? 'ongoing' : ($status_resolved == '2' ? 'unresolved' : 'unknown');
+
+          return response()->json([
+              'error' => true,
+              'error_msg'=> 'There is ' . $status_text . ' blotter report with your name in the following category: ' . $category . '. Please go to the barangay to resolve this.'
+          ]);
         }
         if($user_details[0]->isPendingResident == '1')
         {
@@ -841,7 +847,7 @@ class UserController extends Controller
             WHERE schedule_date = ?
         ", [$schedule_date]);
 
-        if ($count_schedules[0]->count >= 5) {
+        if ($count_schedules[0]->count >= 50) {
             return response()->json([
                 'error' => true,
                 'message' => 'The slots for your selected date are full. Please choose another date.'
