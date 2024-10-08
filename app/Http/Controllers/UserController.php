@@ -60,6 +60,17 @@ class UserController extends Controller
             'cell_number' => $request->cell_number,
             'civil_status_id' => $request->civil_status_id,
             'male_female' => $request->male_female,
+            'block' => $request->block,             
+            'lot' => $request->lot,                 
+            'purok' => $request->purok,             
+            'street' => $request->street,           
+            'household' => $request->household,
+            'house_and_lot_ownership' => $request->house_and_lot_ownership,
+            'living_with_owner' => $request->living_with_owner,             
+            'renting' => $request->renting,                                 
+            'relationship_to_owner' => $request->relationship_to_owner,     
+            'pet_details' => $request->pet_details,                         
+            'pet_vaccination' => $request->pet_vaccination,     
             'isPendingResident' => 0
         ];
 
@@ -151,6 +162,17 @@ class UserController extends Controller
                 'male_female' => $request->male_female,
                 'current_address' => $request->current_address,
                 'voter_status' => $request->voter_status,
+                'block' => $request->block,             
+                'lot' => $request->lot,                 
+                'purok' => $request->purok,             
+                'street' => $request->street,           
+                'household' => $request->household,
+                'house_and_lot_ownership' => $request->house_and_lot_ownership,
+                'living_with_owner' => $request->living_with_owner,             
+                'renting' => $request->renting,                                 
+                'relationship_to_owner' => $request->relationship_to_owner,     
+                'pet_details' => $request->pet_details,                         
+                'pet_vaccination' => $request->pet_vaccination,
                 'isPendingResident' => '1'
             ]);
         foreach($request->file_upload as $file) {
@@ -298,6 +320,17 @@ class UserController extends Controller
             u.middle_name,
             u.last_name,
             CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as full_name,
+            u.block,              
+            u.lot,                
+            u.purok,              
+            u.street,             
+            u.household,
+            u.house_and_lot_ownership,  
+            u.living_with_owner,        
+            u.renting,                  
+            u.relationship_to_owner,    
+            u.pet_details,              
+            u.pet_vaccination, 
             r.role_type,
             '$current_session_role' as current_session_role
         FROM users as u
@@ -406,6 +439,17 @@ class UserController extends Controller
         CASE WHEN u.middle_name IS NULL THEN '' ELSE u.middle_name END as middle_name,
         u.last_name,
         u.civil_status_id,
+        u.block,
+        u.lot,
+        u.purok,
+        u.street,
+        u.household,
+        u.house_and_lot_ownership,  
+        u.living_with_owner,        
+        u.renting,                  
+        u.relationship_to_owner,    
+        u.pet_details,              
+        u.pet_vaccination,
         (SELECT COUNT(id) FROM appointments WHERE user_id = u.id ) as appointments_made,
         ct.civil_status_type,
         u.male_female,
@@ -519,6 +563,17 @@ class UserController extends Controller
         $update_string .= !is_null($request->male_female) ? "male_female = '$request->male_female'," : '';
         $update_string .= !is_null($request->current_address) ? "current_address = '$request->current_address'," : '';
         $update_string .= !is_null($request->voter_status) ? "voter_status = '$request->voter_status'," : '';
+        $update_string .= !is_null($request->block) ? "block = '$request->block'," : '';
+        $update_string .= !is_null($request->lot) ? "lot = '$request->lot'," : '';
+        $update_string .= !is_null($request->purok) ? "purok = '$request->purok'," : '';
+        $update_string .= !is_null($request->street) ? "street = '$request->street'," : '';
+        $update_string .= !is_null($request->household) ? "household = '$request->household'," : '';
+        $update_string .= !is_null($request->house_and_lot_ownership) ? "house_and_lot_ownership = '$request->house_and_lot_ownership'," : ''; 
+        $update_string .= !is_null($request->living_with_owner) ? "living_with_owner = '$request->living_with_owner'," : ''; 
+        $update_string .= !is_null($request->renting) ? "renting = '$request->renting'," : ''; 
+        $update_string .= !is_null($request->relationship_to_owner) ? "relationship_to_owner = '$request->relationship_to_owner'," : ''; 
+        $update_string .= !is_null($request->pet_details) ? "pet_details = '$request->pet_details'," : ''; 
+        $update_string .= !is_null($request->pet_vaccination) ? "pet_vaccination = '$request->pet_vaccination'," : '';
         $update_string = rtrim($update_string, ',');
         $bo_details = DB::SELECT("SELECT
         user_id,
