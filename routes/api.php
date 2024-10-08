@@ -33,6 +33,7 @@ Route::middleware(['AuthUser:1-2-3'])->group(function () {
     Route::get('viewCivilStatusTypes', [UserController::class, 'viewCivilStatusTypes']);
     Route::get('viewBarangayOfficials', [BarangayOfficialController::class, 'viewBarangayOfficials']);
     Route::get('getDocumentTypes', [DocumentController::class, 'getDocumentTypes']);
+    Route::post('/checkDateAvailability', [UserController::class, 'checkDateAvailability']);
     Route::post('createAppointment', [UserController::class, 'createAppointment']);
     Route::get('viewAppointmentList', [AdminController::class, 'viewAppointmentList']);
     Route::get('viewSpecificFile', [AdminController::class, 'viewSpecificFile']);
