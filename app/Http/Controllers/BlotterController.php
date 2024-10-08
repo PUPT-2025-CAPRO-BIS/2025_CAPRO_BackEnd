@@ -272,11 +272,11 @@ class BlotterController extends Controller
         $blotter_details = DB::table('blotter_reports')
             ->where('id', $request->blotter_id)
             ->first();
-
+    
         if (!$blotter_details) {
             return response()->json(['error' => 'Blotter not found'], 404);
         }
-
+    
         // Initialize default values for phone and address
         $complainant_name = $blotter_details->complainant_name ?? 'N/A';
         $complainant_address = 'N/A';
@@ -284,44 +284,48 @@ class BlotterController extends Controller
         $complainee_name = $blotter_details->complainee_name ?? 'N/A';
         $complainee_address = 'N/A';
         $complainee_phone = $blotter_details->complainee_phone_number ?? 'N/A'; 
-
+    
         // Fetch complainant details from the 'users' table if complainant_id exists
         if ($blotter_details->complainant_id) {
             $complainant = DB::table('users')
                 ->where('id', $blotter_details->complainant_id)
-                ->select('first_name', 'middle_name', 'last_name', 'current_address')
+                ->select('first_name', 'middle_name', 'last_name', 'block', 'lot', 'purok', 'street')
                 ->first();
-
+    
             if ($complainant) {
                 // Construct the full name of the complainant
                 $complainant_name = trim("{$complainant->first_name} {$complainant->middle_name} {$complainant->last_name}");
-                $complainant_address = $complainant->current_address ?? 'N/A';
+    
+                // Construct the address using block, lot, purok, street
+                $complainant_address = "{$complainant->block} {$complainant->lot}, {$complainant->purok}, {$complainant->street}" ?? 'N/A';
             }
         }
-
+    
         // Fetch complainee details from the 'users' table if complainee_id exists
         if ($blotter_details->complainee_id) {
             $complainee = DB::table('users')
                 ->where('id', $blotter_details->complainee_id)
-                ->select('first_name', 'middle_name', 'last_name', 'current_address')
+                ->select('first_name', 'middle_name', 'last_name', 'block', 'lot', 'purok', 'street')
                 ->first();
-
+    
             if ($complainee) {
                 // Construct the full name of the complainee
                 $complainee_name = trim("{$complainee->first_name} {$complainee->middle_name} {$complainee->last_name}");
-                $complainee_address = $complainee->current_address ?? 'N/A';
+    
+                // Construct the address using block, lot, purok, street
+                $complainee_address = "{$complainee->block} {$complainee->lot}, {$complainee->purok}, {$complainee->street}" ?? 'N/A';
             }
         }
-
+    
         // If complainant_id or complainee_id is NULL, use non-resident fields for address
         if (!$blotter_details->complainant_id) {
             $complainant_address = $blotter_details->non_resident_address ?? 'N/A';
         }
-
+    
         if (!$blotter_details->complainee_id) {
             $complainee_address = $blotter_details->non_resident_address ?? 'N/A';
         }
-
+    
         // Prepare the data to pass to the Blade view
         $data = [
             'title' => 'Blotter Report',
@@ -333,11 +337,11 @@ class BlotterController extends Controller
             'complainee_address' => $complainee_address,
             'complainee_phone' => $complainee_phone  
         ];
-
+    
         // Load the view and generate the PDF
         $pdf = PDF::loadView('document.blotter', $data);
         $pdf->setPaper('A4', 'portrait');
-
+    
         // Return the PDF for download or streaming
         return $request->download == 1 ? $pdf->download('blotter_report.pdf') : $pdf->stream('blotter_report.pdf');
     }
