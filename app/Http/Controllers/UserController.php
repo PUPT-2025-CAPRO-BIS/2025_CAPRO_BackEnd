@@ -830,6 +830,30 @@ class UserController extends Controller
             return false;
         }
     }
+
+    public function checkDateAvailability(Request $request)
+    {
+        $schedule_date = $request->schedule_date;
+
+        $count_schedules = DB::select("
+            SELECT COUNT(id) as count
+            FROM appointments
+            WHERE schedule_date = ?
+        ", [$schedule_date]);
+
+        if ($count_schedules[0]->count >= 5) {
+            return response()->json([
+                'error' => true,
+                'message' => 'The slots for your selected date are full. Please choose another date.'
+            ], 200);
+        } else {
+            return response()->json([
+                'error' => false,
+                'message' => 'Slots are available.'
+            ], 200);
+        }
+    }
+
     function createAppointment(Request $request)
     {
         $purpose = '';
