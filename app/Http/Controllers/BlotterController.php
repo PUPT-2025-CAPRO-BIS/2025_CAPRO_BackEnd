@@ -206,7 +206,10 @@ class BlotterController extends Controller
     
             // If "Others" is selected, filter for categories not matching specific ones
             if ($category === "Others") {
-                $category_filter = "AND br.category NOT IN ('Noise', 'Theft', 'Test')";
+                $category_filter = "AND br.category NOT IN ('Assault', 'Verbal Abuse', 
+                    'Theft', 'Domestic Violence', 'Vandalism', 'Trespassing', 
+                    'Public Disturbance', 'Disorderly Conduct', 'Child Welfare Concern', 
+                    'Harassment', 'Property Conflict', 'Neighbor Conflict')";
             } else {
                 $category_filter = "AND br.category = '$category'";
             }
