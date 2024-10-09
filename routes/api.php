@@ -86,5 +86,6 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::get('downloadAppointments', [HistoryController::class, 'downloadAppointments']);
     Route::get('downloadBlotters', [HistoryController::class, 'downloadBlotters']);
     Route::get('downloadUsers', [HistoryController::class, 'downloadUsers']);
+    Route::get('downloadPendingResidents', [HistoryController::class, 'downloadPendingResidents']);
     Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
     Route::get('downloadBlotterPDF', [BlotterController::class, 'downloadBlotterPDF']);
