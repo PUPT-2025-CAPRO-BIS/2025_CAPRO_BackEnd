@@ -23,19 +23,42 @@ class HistoryController extends Controller
                 "apt.otp_used like '%$request->search_value%'" .
                 ")";
         }
-
+    
         $date_filter = '';
+        $from_date = '';
+        $to_date = '';
+    
         // Check if both from_date and to_date are provided
         if ($request->from_date && $request->to_date) {
+            // Use provided date range
             $from_date = $request->from_date;
             $to_date = $request->to_date;
             $date_filter = "AND apt.schedule_date BETWEEN '$from_date' AND '$to_date'";
-        } 
-        // If only schedule_date is provided (legacy filter)
-        elseif ($request->schedule_date) {
-            $date_filter = "AND apt.schedule_date = '$request->schedule_date'";
+        } else {
+            // Get the oldest and latest schedule dates from the appointments table if no date range is provided
+            $dateRange = DB::select("
+                SELECT 
+                    MIN(apt.schedule_date) AS oldest_date, 
+                    MAX(apt.schedule_date) AS latest_date 
+                FROM appointments AS apt
+                LEFT JOIN users AS u ON u.id = apt.user_id
+                LEFT JOIN document_types AS doc_type ON doc_type.id = apt.document_type_id
+                WHERE apt.id IS NOT NULL
+                $search_value
+            ");
+            
+            if ($dateRange && count($dateRange) > 0) {
+                $from_date = date('Y-m-d', strtotime($dateRange[0]->oldest_date));
+                $to_date = date('Y-m-d', strtotime($dateRange[0]->latest_date));
+                // Adjust filter based on the actual oldest and latest dates
+                $date_filter = "AND apt.schedule_date BETWEEN '$from_date' AND '$to_date'";
+            } else {
+                // Handle case where no records are found and no date range can be determined
+                $from_date = 'N/A';
+                $to_date = 'N/A';
+            }
         }
-
+    
         // Fetch appointments with filters
         $appointments = DB::select("SELECT
                 apt.id as 'No.',
@@ -55,7 +78,7 @@ class HistoryController extends Controller
                 $date_filter
                 ORDER BY apt.id DESC
         ");
-
+    
         // Create and populate spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -63,49 +86,73 @@ class HistoryController extends Controller
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
         $sheet->setTitle('Appointments Data');
-
-        // Set headers
+    
+        // Determine the maximum number of columns (based on the headers)
+        $maxColumn = count($appointments) > 0 ? count(array_keys(get_object_vars($appointments[0]))) : 8; // Assuming at least 8 columns
+    
+        // Merge cells for "Appointment Report" and set the title
+        $sheet->mergeCells('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '1');
+        $sheet->setCellValue('A1', 'Appointment Report');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Merge cells for Date Range and set the date range
+        $sheet->mergeCells('A2:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '2');
+        if ($from_date !== 'N/A' && $to_date !== 'N/A') {
+            $sheet->setCellValue('A2', "Date Range: $from_date to $to_date");
+        } else {
+            $sheet->setCellValue('A2', "Date Range: Not Specified");
+        }
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Set headers (starting from row 3)
         if (count($appointments) > 0) {
             $headers = array_keys(get_object_vars($appointments[0]));
             foreach ($headers as $key => $header) {
-                $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1);
+                $sheet->setCellValue($columnLetter . '3', ucfirst($header));
+                $sheet->getStyle($columnLetter . '3')->getFont()->setBold(true);
             }
         }
-
-        // Populate rows with appointment data
-        $row = 2;
+    
+        // Populate rows with appointment data (starting from row 4)
+        $row = 4;
         foreach ($appointments as $appointment) {
             $col = 1;
             foreach ($appointment as $value) {
-                $sheet->setCellValue([$col, $row], $value);
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                $sheet->setCellValue($columnLetter . $row, $value);
                 $col++;
             }
             $row++;
         }
-
+    
         // Prepare Excel file for download
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'Appointments.xlsx';
-
+        $fileName = 'Appointment Report.xlsx';
+    
         $response = new StreamedResponse(function() use ($writer) {
             $writer->save('php://output');
         });
-
+    
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
         $response->headers->set('Cache-Control', 'max-age=0');
-
+    
         return $response;
     }
     public function downloadBlotters(Request $request)
     {
         $user_id = session("UserId");
-
+    
         // Initialize filters
         $search_value = '';
         $category_filter = '';
         $date_filter = '';
-
+        $from_date = '';
+        $to_date = '';
+    
         // Search filter
         if ($request->search_value) {
             $search_value = "AND (br.complainee_name LIKE '%$request->search_value%' OR ".
@@ -114,18 +161,41 @@ class HistoryController extends Controller
                             "au.middle_name LIKE '%$request->search_value%' OR ".
                             "au.last_name LIKE '%$request->search_value%')";
         }
-
+    
         // Date range filter
         if ($request->from_date && $request->to_date) {
-            $from_date = $request->from_date . ' 00:00:00';  // Ensure start of the day
-            $to_date = $request->to_date . ' 23:59:59';      // Ensure end of the day
-            $date_filter = "AND br.created_at BETWEEN '$from_date' AND '$to_date'";
+            // Use provided date range
+            $from_date = date('Y-m-d', strtotime($request->from_date)); // Extract only date
+            $to_date = date('Y-m-d', strtotime($request->to_date));     // Extract only date
+            $date_filter = "AND br.created_at BETWEEN '$from_date 00:00:00' AND '$to_date 23:59:59'";
+        } else {
+            // Get the oldest and latest dates from the blotters table if no date range is provided
+            $dateRange = DB::select("
+                SELECT 
+                    MIN(br.created_at) AS oldest_date, 
+                    MAX(br.created_at) AS latest_date 
+                FROM blotter_reports AS br
+                WHERE br.id IS NOT NULL
+                $search_value
+                $category_filter
+            ");
+            
+            if ($dateRange && count($dateRange) > 0) {
+                $from_date = date('Y-m-d', strtotime($dateRange[0]->oldest_date));
+                $to_date = date('Y-m-d', strtotime($dateRange[0]->latest_date));
+                // Adjust filter based on the actual oldest and latest dates
+                $date_filter = "AND br.created_at BETWEEN '$from_date 00:00:00' AND '$to_date 23:59:59'";
+            } else {
+                // Handle case where no records are found and no date range can be determined
+                $from_date = 'N/A';
+                $to_date = 'N/A';
+            }
         }
-
+    
         // Category filter
         if ($request->category) {
             $category = $request->category;
-
+    
             // If "Others" is selected, get entries not matching specified categories
             if ($category === "Others") {
                 $category_filter = "AND br.category NOT IN ('Assault', 'Verbal Abuse', 
@@ -136,7 +206,7 @@ class HistoryController extends Controller
                 $category_filter = "AND br.category = '$category'";
             }
         }
-
+    
         // Execute the query with dynamic filters, including category
         $blotters = DB::select("
             SELECT
@@ -171,12 +241,12 @@ class HistoryController extends Controller
             $category_filter
             ORDER BY br.id DESC
         ");
-
+    
         // If no blotters found, return a message (for debugging)
         if (empty($blotters)) {
             return response()->json(['message' => 'No blotters found for the given criteria'], 404);
         }
-
+    
         // Create and populate spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -185,43 +255,60 @@ class HistoryController extends Controller
         foreach (range('A', 'Z') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
-
+    
         $sheet->setTitle('Blotters Data');
-
-        // Set headers, including the 'Category' column
+    
+        // Determine the maximum number of columns
+        $maxColumn = count($blotters) > 0 ? count(array_keys(get_object_vars($blotters[0]))) : 8; // Assuming at least 8 columns
+    
+        // Merge cells for "Blotter Report" and set the title
+        $sheet->mergeCells('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '1');
+        $sheet->setCellValue('A1', 'Blotter Report');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Set the date range in the header based on the calculated or provided dates
+        $sheet->mergeCells('A2:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '2');
+        if ($from_date !== 'N/A' && $to_date !== 'N/A') {
+            $sheet->setCellValue('A2', "Date Range: $from_date to $to_date");
+            $sheet->getStyle('A2')->getFont()->setBold(true);
+            $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        }
+    
+        // Set headers (starting from row 3)
         if (count($blotters) > 0) {
             $headers = array_keys(get_object_vars($blotters[0]));
             foreach ($headers as $key => $header) {
-                // Convert numeric index to Excel-style column (A, B, C, ...)
-                $column = Coordinate::stringFromColumnIndex($key + 1);
-                $sheet->setCellValue($column . '1', ucfirst($header));  // Add 'Category' as a header
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1);
+                $sheet->setCellValue($columnLetter . '3', ucfirst($header));
+                $sheet->getStyle($columnLetter . '3')->getFont()->setBold(true);
             }
         }
-
-        // Populate rows with blotter data, including the 'Category' column
-        $row = 2; // Starting from the second row
+    
+        // Populate rows with blotter data (starting from row 4)
+        $row = 4;
         foreach ($blotters as $blotter) {
             $col = 1;
             foreach ($blotter as $value) {
-                $column = Coordinate::stringFromColumnIndex($col);
-                $sheet->setCellValue($column . $row, $value);
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                $sheet->setCellValue($columnLetter . $row, $value);
                 $col++;
             }
             $row++;
         }
-
+    
         // Prepare Excel file for download
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'Blotters-Reports.xlsx';
-
+        $fileName = 'Blotter Report.xlsx';
+    
         $response = new StreamedResponse(function() use ($writer) {
             $writer->save('php://output');
         });
-
+    
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
         $response->headers->set('Cache-Control', 'max-age=0');
-
+    
         return $response;
     }
     public function downloadUsers(Request $request)
