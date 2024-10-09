@@ -313,98 +313,194 @@ class HistoryController extends Controller
     }
     public function downloadUsers(Request $request)
     {
-        
         $user_id = session("UserId");
-        /*
-        $item_per_page = $request->item_per_page;
-        $page_number = $request->page_number;
-
-        $offset = $item_per_page * ($page_number - 1);
-        $offset_value = '';
-        if($offset != 0)
-        {
-            $offset_value = 'OFFSET ' . ($item_per_page * ($page_number - 1));
-        }
+    
+        // Initialize search value
         $search_value = '';
-        if($request->search_value)
-        {
-            $search_value = "WHERE first_name like '%$request->search_value%' OR ".
-            "middle_name like '%$request->search_value%' OR " .
-            "last_name like '%$request->search_value%'";
-        }
-            */
-        $search_value = '';
-        if($request->search_value)
-        {
+        if ($request->search_value) {
             $search_value = "AND (first_name like '%$request->search_value%' OR ".
-            "middle_name like '%$request->search_value%' OR " .
-            "last_name like '%$request->search_value%')";
+                            "middle_name like '%$request->search_value%' OR " .
+                            "last_name like '%$request->search_value%')";
         }
-
-
-        $dbq = '"';
+    
+        // Filter by `isPendingResident = 0` (approved residents only)
         $users = DB::select("SELECT
-        u.id as 'No.',
-        CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as 'Name',
-        u.Email as ' Email',
-        ct.civil_status_type as 'Civil Status',
-        CASE WHEN u.male_female = 0 THEN 'Male' ELSE 'Female' END as 'Gender',
-        u.birthday as 'Birthday',
-        u.cell_number as 'Cellphone No.',
-        CASE WHEN u.voter_status = 0 THEN 'No' ELSE 'Yes' END as 'Is Voter?',
-        u.current_address as 'Address',
-        CASE WHEN u.isPendingResident = 0 THEN 'Yes' ELSE 'No' END as 'Is Pending Approval',
-        DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS Age
-        FROM(
-        SELECT *
-        FROM users
-        WHERE id != '$user_id'
-        $search_value
-        ORDER BY isPendingResident DESC,id ASC
-        ) as u
-        LEFT JOIN barangay_officials as bo on bo.user_id = u.id
-        LEFT JOIN user_roles as ur on ur.user_id = u.id
-        LEFT JOIN civil_status_types as ct on ct.id = u.civil_status_id
+            u.id as 'No.',
+            CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END),u.middle_name,' ',u.last_name) as 'Name',
+            u.Email as 'Email',
+            ct.civil_status_type as 'Civil Status',
+            CASE WHEN u.male_female = 0 THEN 'Male' ELSE 'Female' END as 'Gender',
+            u.birthday as 'Birthday',
+            CASE WHEN u.voter_status = 0 THEN 'No' ELSE 'Yes' END as 'Is Voter?',
+            DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS Age,
+            u.block as 'Block',
+            u.lot as 'Lot',
+            u.purok as 'Purok',
+            u.street as 'Street',
+            u.household as 'Household',
+            u.house_and_lot_ownership as 'House and Lot Ownership',
+            u.living_with_owner as 'Living With Owner',
+            u.renting as 'Renting',
+            u.relationship_to_owner as 'Relationship to Owner',
+            u.pet_details as 'Pet Details',
+            u.pet_vaccination as 'Pet Vaccination'
+            FROM users u
+            LEFT JOIN civil_status_types ct ON ct.id = u.civil_status_id
+            WHERE u.id != '$user_id' 
+            AND u.isPendingResident = 0 
+            $search_value
+            ORDER BY u.id ASC
         ");
+    
+        // Create and populate the spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+    
+        // Set column auto-sizing
         foreach (range('A', 'Z') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
+    
         // Set the sheet title
-        $sheet->setTitle('Users Data');
-
-        // Get the headers from the first item in the collection
-        $headers = array_keys(get_object_vars($users[0]));
-        // Populate headers
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValue([$key + 1, 1], ucfirst($header));
+        $sheet->setTitle('Residents Report');
+    
+        // Merge cells for "Users Report" and set the title
+        $maxColumn = count($users) > 0 ? count(array_keys(get_object_vars($users[0]))) : 8; // Assuming at least 8 columns
+        $sheet->mergeCells('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '1');
+        $sheet->setCellValue('A1', 'Residents Report');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Set headers (starting from row 2)
+        if (count($users) > 0) {
+            $headers = array_keys(get_object_vars($users[0]));
+            foreach ($headers as $key => $header) {
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1);
+                $sheet->setCellValue($columnLetter . '2', ucfirst($header));
+                $sheet->getStyle($columnLetter . '2')->getFont()->setBold(true);
+            }
         }
-        // Populate the spreadsheet with the collection data
-        $row = 2; // Starting from the second row (first row for headers)
+    
+        // Populate the spreadsheet with user data (starting from row 3)
+        $row = 3;
         foreach ($users as $user) {
             $col = 1;
             foreach ($user as $value) {
-                $sheet->setCellValue([$col, $row], $value);
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                $sheet->setCellValue($columnLetter . $row, $value);
                 $col++;
             }
             $row++;
         }
+    
         // Write the file to a temporary location
         $writer = new Xlsx($spreadsheet);
-        
-        $fileName = 'User-List.xlsx';
-
+        $fileName = 'Residents Report.xlsx';
+    
         $response = new StreamedResponse(function() use ($writer) {
             $writer->save('php://output');
         });
-
+    
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
         $response->headers->set('Cache-Control', 'max-age=0');
-
+    
         return $response;
-        return $users;
-        //return response()->json($users,200);
+    }
+    public function downloadPendingResidents(Request $request)
+    {
+        $user_id = session("UserId");
+    
+        // Initialize search value
+        $search_value = '';
+        if ($request->search_value) {
+            $search_value = "AND (first_name like '%$request->search_value%' OR ".
+                            "middle_name like '%$request->search_value%' OR " .
+                            "last_name like '%$request->search_value%')";
+        }
+    
+        // Filter by `isPendingResident = 1` (pending residents only)
+        $pendingResidents = DB::select("SELECT
+            u.id as 'No.',
+            CONCAT(u.first_name, (CASE WHEN u.middle_name = '' THEN '' ELSE ' ' END), u.middle_name, ' ', u.last_name) as 'Name',
+            u.Email as 'Email',
+            ct.civil_status_type as 'Civil Status',
+            CASE WHEN u.male_female = 0 THEN 'Male' ELSE 'Female' END as 'Gender',
+            u.birthday as 'Birthday',
+            CASE WHEN u.voter_status = 0 THEN 'No' ELSE 'Yes' END as 'Is Voter?',
+            DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), u.birthday )), '%Y') + 0 AS Age,
+            u.block as 'Block',
+            u.lot as 'Lot',
+            u.purok as 'Purok',
+            u.street as 'Street',
+            u.household as 'Household',
+            u.house_and_lot_ownership as 'House and Lot Ownership',
+            u.living_with_owner as 'Living With Owner',
+            u.renting as 'Renting',
+            u.relationship_to_owner as 'Relationship to Owner',
+            u.pet_details as 'Pet Details',
+            u.pet_vaccination as 'Pet Vaccination'
+            FROM users u
+            LEFT JOIN civil_status_types ct ON ct.id = u.civil_status_id
+            WHERE u.id != '$user_id' 
+            AND u.isPendingResident = 1
+            $search_value
+            ORDER BY u.id ASC
+        ");
+    
+        // Create and populate the spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Set column auto-sizing
+        foreach (range('A', 'Z') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+    
+        // Set the sheet title
+        $sheet->setTitle('Pending Residents Report');
+    
+        // Merge cells for "Pending Residents Report" and set the title
+        $maxColumn = count($pendingResidents) > 0 ? count(array_keys(get_object_vars($pendingResidents[0]))) : 8; // Assuming at least 8 columns
+        $sheet->mergeCells('A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($maxColumn) . '1');
+        $sheet->setCellValue('A1', 'Pending Residents Report');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Set headers (starting from row 2)
+        if (count($pendingResidents) > 0) {
+            $headers = array_keys(get_object_vars($pendingResidents[0]));
+            foreach ($headers as $key => $header) {
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1);
+                $sheet->setCellValue($columnLetter . '2', ucfirst($header));
+                $sheet->getStyle($columnLetter . '2')->getFont()->setBold(true);
+            }
+        }
+    
+        // Populate the spreadsheet with pending resident data (starting from row 3)
+        $row = 3;
+        foreach ($pendingResidents as $resident) {
+            $col = 1;
+            foreach ($resident as $value) {
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                $sheet->setCellValue($columnLetter . $row, $value);
+                $col++;
+            }
+            $row++;
+        }
+    
+        // Write the file to a temporary location
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Pending Residents Report.xlsx';
+    
+        $response = new StreamedResponse(function() use ($writer) {
+            $writer->save('php://output');
+        });
+    
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+    
+        return $response;
     }
 }
