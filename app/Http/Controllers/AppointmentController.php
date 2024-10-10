@@ -37,96 +37,163 @@ class AppointmentController extends Controller
     }
     public function downloadAndReleaseDocument(Request $request)
     {
-            // Pass any data you need to the view
-            $download = 0;
-            if($request->download)
-            {
-                $download = $request->download;
-            }
-            $appointment_deets = DB::table('appointments')
-            ->where('id','=',$request->appointment_id)
+        // Pass any data you need to the view
+        $download = 0;
+        if ($request->download) {
+            $download = $request->download;
+        }
+        $appointment_deets = DB::table('appointments')
+            ->where('id', '=', $request->appointment_id)
             ->get();
-            if(count($appointment_deets)< 1)
-            {
-                return response()->json([
-                    'error_msg' => 'This appointment does not exist',
-                    'error' => true
-                ]);
-            }
-            /*
-            if($appointment_deets[0]->status != 'Approved')
-            {
-                return response()->json([
-                    'error_msg' => 'This appointment was not approved',
-                    'error' => true
-                ]);
-            }
-                */
+        if (count($appointment_deets) < 1) {
+            return response()->json([
+                'error_msg' => 'This appointment does not exist',
+                'error' => true
+            ]);
+        }
+        DB::table('appointments')
+            ->where('id', '=', $request->appointment_id)
+            ->update(['status' => 'Released']);
+        
+        if ($request->user_id) {
+            createAuditLog($request->user_id, 'Appointment Released', $request->appointment_id, 'released');
+        }
+        
+        if (is_null($appointment_deets[0]->updated_at)) {
             DB::table('appointments')
-                ->where('id','=',$request->appointment_id)
-                ->update([
-                    'status' => 'Released'
-                ]);
-            if($request->user_id)
-            {
-                createAuditLog($request->user_id, 'Appointment Released' ,$request->appointment_id,'released');
+                ->where('id', '=', $request->appointment_id)
+                ->update(['updated_at' => date('Y-m-d H:i:s')]);
+        }
+    
+        $appointment_deets = $appointment_deets[0];
+        $doc = DB::select("SELECT * FROM document_types WHERE id = '$appointment_deets->document_type_id'")[0];
+        $description = $doc->description;
+        $title = $doc->service;
+        $user_deets = DB::table('users')
+            ->where('id', '=', $appointment_deets->user_id)
+            ->get()[0];
+        
+        // Fetch civil_status_id directly and use it to determine the civil status
+        $civil_status_id = $user_deets->civil_status_id;
+    
+        // Get today's date and add ordinal suffix directly to the day
+        $currentDate = new DateTime();
+        $month = $currentDate->format('F');
+        $day = $currentDate->format('j');
+        if (!in_array(($day % 100), [11, 12, 13])) {
+            switch ($day % 10) {
+                case 1: $day .= 'st'; break;
+                case 2: $day .= 'nd'; break;
+                case 3: $day .= 'rd'; break;
+                default: $day .= 'th'; break;
             }
-            if(is_null($appointment_deets[0]->updated_at))
-            {
-                DB::table('appointments')
-                ->where('id','=',$request->appointment_id)
-                ->update([
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            }
-            $appointment_deets = $appointment_deets[0];
-            $doc = DB::select("SELECT
-            *
-            FROM document_types
-            WHERE id = '$appointment_deets->document_type_id'
-            ")[0];
-            $description =$doc->description;
-            $title = $doc->service;
-            $user_deets = DB::table('users')
-                ->where('id','=',$appointment_deets->user_id)
-                ->get()[0];
-            $user_civil_status_type = DB::table('civil_status_types')
-                ->where('id',$user_deets->civil_status_id)
-                ->get()[0]->civil_status_type;
-                $user_deets->civil_status = $user_civil_status_type;
-            $params = [];
-            foreach($user_deets as $field => $value)
-            {
-                if(!is_null($value))
-                {
-                    if($field == 'birthday')
-                    {
-                        $value = new DateTime($value);
-                        $format = 'F d, Y';
-                        $value = $value->format($format);
-                    }
-                    if($field == 'male_female')
-                    {
-                        $field = 'gender';
-                        $value = $value == 0 ? 'male' : 'female';
-                    }
-                    $description = str_replace('$' . $field, $value, $description);
+        } else {
+            $day .= 'th';
+        }
+        $year = $currentDate->format('Y');
+    
+        // Update the description with today's date placeholders
+        $description = str_replace('$month', $month, $description);
+        $description = str_replace('$day', $day, $description);
+        $description = str_replace('$year', $year, $description);
+    
+        // Combine block, lot, purok, and street into a full address
+        $address = '';
+        if (!is_null($user_deets->block)) {
+            $address .= $user_deets->block . ', ';
+        }
+        if (!is_null($user_deets->lot)) {
+            $address .= $user_deets->lot . ', ';
+        }
+        if (!is_null($user_deets->purok)) {
+            $address .= $user_deets->purok . ', ';
+        }
+        if (!is_null($user_deets->street)) {
+            $address .= $user_deets->street;
+        }
+        $address = rtrim($address, ', ');
+    
+        // Replace user details in the description
+        foreach ($user_deets as $field => $value) {
+            if (!is_null($value)) {
+                if ($field == 'birthday') {
+                    $value = (new DateTime($value))->format('F d, Y');
                 }
+                if ($field == 'male_female') {
+                    $field = 'gender';
+                    $value = $value == 0 ? 'male' : 'female';
+                }
+                $description = str_replace('$' . $field, $value, $description);
             }
-            $description = str_replace('$name', 
-                $user_deets->first_name . ' '  .
-                ($user_deets->middle_name == '' || is_null($user_deets->middle_name) ? '' : $user_deets->middle_name . ' ') .
-                $user_deets->last_name
-                , $description);
-            $data = [
-                'title' => $title,
-                'html_code' => $description
-            ];
-            // Load a view file and pass data to it
-            $pdf = Pdf::loadView('document.template', $data);
-            $pdf->setPaper('A4','portrait');
-            // Return the generated PDF to the browser
-            
-            return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', array("Attachment" => false));
+        }
+    
+        // Replace the full name
+        $description = str_replace('$name',
+            $user_deets->first_name . ' ' .
+            ($user_deets->middle_name == '' || is_null($user_deets->middle_name) ? '' : $user_deets->middle_name . ' ') .
+            $user_deets->last_name,
+            $description
+        );
+    
+        // Replace the address
+        $description = str_replace('$address', $address, $description);
+    
+        // Handle civil status layout based on civil_status_id (1=Single, 2=Married, 3=Widowed, 4=Separated)
+        $civil_status_layout = '';
+    
+        switch ($civil_status_id) {
+            case 1:
+                $civil_status_layout = '<u>single</u>/married/widowed/separated';
+                break;
+            case 2:
+                $civil_status_layout = 'single/<u>married</u>/widowed/separated';
+                break;
+            case 3:
+                $civil_status_layout = 'single/married/<u>widowed</u>/separated';
+                break;
+            case 4:
+                $civil_status_layout = 'single/married/widowed/<u>separated</u>';
+                break;
+            default:
+                $civil_status_layout = 'single/married/widowed/separated'; // Default layout
+                break;
+        }
+    
+        $description = str_replace('$civil_status', $civil_status_layout, $description);
+    
+        // Handle house and lot ownership layout with underlining
+        $house_and_lot_status = '';
+        if ($user_deets->house_and_lot_ownership === 'Yes') {
+            $house_and_lot_status = 'homeowner';
+        } elseif ($user_deets->house_and_lot_ownership === 'No') {
+            $house_and_lot_status = 'tenant';
+        }
+        $house_and_lot_options = ['tenant', 'homeowner'];
+        $house_and_lot_layout = '';
+    
+        // Create the layout for house and lot ownership, underlining the correct one
+        foreach ($house_and_lot_options as $option) {
+            if ($option === $house_and_lot_status) {
+                $house_and_lot_layout .= "<u>$option</u>";
+            } else {
+                $house_and_lot_layout .= $option;
+            }
+            if ($option !== end($house_and_lot_options)) {
+                $house_and_lot_layout .= '/';
+            }
+        }
+        $description = str_replace('$house_and_lot_status', $house_and_lot_layout, $description);
+    
+        $data = [
+            'title' => $title,
+            'html_code' => $description
+        ];
+    
+        // Load a view file and pass data to it
+        $pdf = Pdf::loadView('document.template', $data);
+        $pdf->setPaper('A4', 'portrait');
+    
+        // Return the generated PDF to the browser
+        return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', ["Attachment" => false]);
     }
 }
