@@ -47,7 +47,7 @@ function createAuditLog($action_taker_id,$action_type,$action_target_id,$log_det
         $user_name = getUserDeets($action_target_id)->full_name;
         $log_details = "$admin_name has $log_details the user details for user $user_name";
     }
-    $date = date('Y-m-d');
+    $date = date('Y-m-d H:i:s');
     DB::table('audit_logs')->insert([
         'action_taker_id' => $action_taker_id,
         'action_type'=> $action_type,
