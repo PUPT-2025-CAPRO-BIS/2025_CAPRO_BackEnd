@@ -252,7 +252,7 @@
 <div style="width: 100% ; display: flex; clear:both; position:relative;border-color">
     <div style="background-color: #058c61; width: 30%;position:absolute; left:0pt;top:0pt;bottom:0pt;padding-left:1%;min-height: 100%">
 
-        <div style="align-items:center;justify-content:center;margin-left:40px">
+        <div style="align-items:center;justify-content:center;margin-left:40px; margin-top: 20px;">
             <img
                 className='ms-5'
                 style="
@@ -264,231 +264,276 @@
         </div>
 
         <div
-            style="margin-top:30px;display:flex;align-items:center;justify-content:center;text-align:center"
+            style="margin-top:25px;display:flex;align-items:center;justify-content:center;text-align:center"
         >
-            <span style="color: white; font-weight: bold">
+            <span style="color: white; font-weight: bold; font-size: 20px">
                 Barangay Council
             </span>
         </div>
 
         <div
-            style=" margin-top: 30px;justify-content: center; marginLeft: 15px"
+            style=" margin-top: 30px;justify-content: center;"
         >
             <span
-                style=" color:white;font-weight: bold; font-size: 10px" 
+                style=" color:white;font-weight: bold; font-size: 12px" 
             >
                 HON. RODOLFO E. TANGPUZ II </br>
             </span>
             <span
-                style=" color: white;font-size:10px"
+                style=" color: white;font-size:12px"
             >
                 BARANGAY CHAIRMAN
             </span>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. MARIA CECILIA T. BALMORI </br>
             </span>
-            <span
+            <div
+                style=" color: white;font-size:12px"
+            >
+                KAGAWAD
+            </div>
+            <div
                 style=" color: white;font-size:10px"
             >
-                KAGAWAD FOR CULTURAL & SPORT
-            </span>
+                CHAIRMAN FOR CULTURAL & SPORT
+            </div>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. VENADIK M. CASTRO </br>
             </span>
-            <span
+            <div
+                style=" color: white;font-size:12px"
+            >
+                KAGAWAD
+            </div>
+            <div
                 style=" color: white;font-size:10px"
             >
-                KAGAWAD CHAIRMAN FOR PEACE & ORDER
-            </span>
+                CHAIRMAN FOR PEACE & ORDER
+            </div>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. LEAH M. PEREZ </br>
             </span>
-            <span
-                style=" color: white;font-size:10px"
+            <div
+                style=" color: white;font-size:12px"
             >
                 KAGAWAD
+            </div>
+            <div
+                style=" color: white;font-size:10px"
+            >
                 CHAIRMAN FOR APPROPRIATION,
                 EDUCATION & INFORMATION
                 DISSEMINATION
-            </span>
+            </div>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
+            >
+                HON. CRISTINA O. SANARES  </br>
+            </span>
+            <div
+                style=" color: white;font-size:12px"
+            >
+                KAGAWAD
+            </div>
+            <div
+                style=" color: white;font-size:10px"
+            >
+                CHAIRMAN FOR ELDERLY & PDAO, FAMILY AFFAIRS
+            </div>
+        </div>
+
+        <div
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+        >
+            <span
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. OLIVER G. OSANO </br>
             </span>
-            <span
+            <div
+                style=" color: white;font-size:12px"
+            >
+                KAGAWAD
+            </div>
+            <div
                 style=" color: white;font-size:10px"
             >
-                KAGAWAD CHAIRMAN FOR TRANSPORTATION
-            </span>
+                CHAIRMAN FOR TRANSPORTATION
+            </div>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. PIULY B. DULANG </br>
             </span>
-            <span
+            <div
+                style=" color: white;font-size:12px"
+            >
+                KAGAWAD
+            </div>
+            <div
                 style=" color: white;font-size:10px"
             >
                 CHAIRMAN FOR HEALTH & ENVIRONMENT SANITATION
-            </span>
+            </div>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 HON. ALYNN REIGN A. RAFIÑAN </br>
             </span>
             <span
-                style=" color: white;font-size:10px"
+                style=" color: white;font-size:12px"
             >
                 SK CHAIRPERSON
             </span>
         </div>
 
 
-
-
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 OLGA H. CALAYO </br>
             </span>
             <span
-                style=" color: white;font-size:10px"
+                style=" color: white;font-size:12px"
             >
                 BARANGAY SECRETARY
             </span>
         </div>
 
         <div
-            style=" margin-top: 30px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
+            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
         >
             <span
-                style=" color:white;font-weight: bold;font-size: 10px" 
+                style=" color:white;font-weight: bold;font-size: 12px" 
             >
                 LILIA T. AMADOR </br>
             </span>
             <span
-                style=" color: white;font-size:10px"
+                style=" color: white;font-size:12px"
             >
                 BARANGAY TREASURER
             </span>
         </div>
 
-
-
+        
+        <div
+            style="position: absolute; bottom: 40; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-left: 0; padding-bottom: 20px; font-family: 'Arial', sans-serif;"
+        >
+            <span style="color: white; font-weight: bold; font-size: 20px; line-height: 1.5;">
+                Serbisyong Tapat
+            </span>
+            <div style="color: white; font-weight: bold; font-size: 20px; line-height: 1.5;">
+                na may
+            </div>
+            <div style="color: white; font-weight: bold; font-size: 20px; line-height: 1.5;">
+                Malasakit at
+            </div>
+            <div style="color: white; font-weight: bold; font-size: 20px; line-height: 1.5;">
+                Pagmamahal
+            </div>
+        </div>
 
 
 
     </div>
 
     <div 
-        style="backgroundClip:white;width:70%;margin-left:31%;align-items:center;text-align:center"
+        style="background-image: url('./images/ilovetaguig.png'); background-size: contain; background-repeat: no-repeat; background-position: center 95%; background-clip: white; width: 70%; margin-left: 31%; align-items: center; text-align: center;"
     >
-        <div
-            style="
-                display:flex; align-items:center; justify-content:space-between;margin-top:50px"
-        >
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
             <div style="clear:both; position:relative">
 
-            <div style="position:absolute; left:0pt; margin-top: 30px;margin-left:50px">
+            <div style="position:absolute; left:0pt; margin-top: 20px; margin-left:10px">
                 <div
                     style="display:flex; flex-direction:column; align-items:center; justify-content:center"
                 >
-                    <h4  style="font-weight:normal">
-                        REPUBLIC OF THE PHILIPPINES
-                    </h4>
-                    <h4  style="font-weight:normal">
-                        CITY OF TAGUIG
-                    </h4>
-                </div>
-
-                <div 
-                     style="flex-direction:column; align-items:center; justify-content:center"
-                >
-                    <h4  style="font-weight:bold">
-                        BARANGAY CENTRAL BICUTAN
-                    </h4>
+                <h1 style="margin: 0; font-size: 21px; font-weight: normal;">REPUBLIC OF THE PHILIPPINES</h1>
+                <h1 style="margin: 0; font-size: 21px; font-weight: normal;">CITY OF TAGUIG</h1>
+                <h1 style="font-weight: bold; margin: 5px 0; font-size: 21px;">BARANGAY CENTRAL BICUTAN</h1>
+                <p style="margin: 0; font-size: 10px; font-family: 'Arial', sans-serif;">DPWH COMP. SUNFLOWER ST. BRGY. CENTRAL BICUTAN TAGUIG CITY</p>
+                <p style="margin: 0; font-size: 10px; font-family: 'Arial', sans-serif;">https://www.facebook.com/profile.php?id=61552727621629</p>
                 </div>
             </div>
-            <div style="margin-left:300px">
+            <div style="margin-left:365px">
             <img
                 style="
-                    height: 120px;
-                    width: 120px;"
+                    height: 150px;
+                    width: 150px;"
                 src='./images/taguig.png'
             />
             </div>
             </div>
         </div>
 
+        <div style="font-family: 'Arial', sans-serif;">
+            <div 
+                style="display:'flex', align-items:'center', justify-content:center; margin-top:10px"
+            >
+                <h4 style="font-weight: normal; font-size: 20px;">
+                    OFFICE OF THE BARANGAY CHAIRMAN
+                </h4>
+            </div>
 
-        <div 
-            style="display:'flex', align-items:'center', justify-content:center; margin-top:50px"
-        >
-            <h4 className='fw-normal'>
-                OFFICE OF THE BARANGAY CHAIRMAN
-            </h4>
+            <div 
+                style="margin-top:30px;margin-bottom:40px;display:flex; flex-direction:column; align-items:center; justify-content:center"
+            >
+                <h4 id='document-title' style="font-size: 19px;">
+                    {!! $title !!}
+                </h4>
+            </div>
+            <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:92%;text-align:left;padding-left:25px;padding-right:15px; font-size: 15px;">
+                {!! $html_code !!}
+            </div>
+            <div className='flex-column d-flex align-items-end pe-5'
+                style="flex-direction: column; display: flex; align-items: center; padding-right: 50px; clear: both; position: relative;"
+            >
+                <span    style="font-weight:bold;position:absolute; right:20pt; top: 40px;">
+                    HON. RODOLFO E. TANGPUZ II
+                </span>
+                <span style="font-style: italic;position:absolute; right:20pt; top: 70px;">
+                    Barangay Chairman
+                </span>
+            </div>
         </div>
-
-        <div 
-            style="margin-top:50px;display:flex; flex-direction:column; align-items:center; justify-content:center"
-        >
-            <h4 id='document-title' >
-                {!! $title !!}
-            </h4>
-        </div>
-        <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:92%;text-align:left;padding-left: 15px;padding-right:15px">
-            {!! $html_code !!}
-        </div>
-        <div className='flex-column d-flex align-items-end pe-5'
-            style="flex-direction:column; display:flex; align-items:center; padding-right:50px;clear:both; position:relative"
-        >
-            <span    style="font-weight:bold;position:absolute; right:20pt">
-                HON. RODOLFO E. TANGPUZ II
-            </span>
-            <span style="font-style: italic;position:absolute; right:20pt;margin-top:15pt">
-                Barangay Chairman
-            </span>
-        </div>
-
 
     </div>
 
