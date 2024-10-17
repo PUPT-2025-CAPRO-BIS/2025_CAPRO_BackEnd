@@ -101,6 +101,7 @@ class DocumentController extends Controller
         $update_string = 'SET ';
         $update_string .= !is_null($request->service) ? "service = '$request->service'," : '';
         $update_string .= !is_null($request->isCertificate) ? "isCertificate = '$request->isCertificate'," : '';
+        $update_string .= !is_null($request->price) ? "price = '$request->price'," : '';
         $update_string = rtrim($update_string, ',');
         if(!is_null($request->service) || !is_null($request->isCertificate))
         {
