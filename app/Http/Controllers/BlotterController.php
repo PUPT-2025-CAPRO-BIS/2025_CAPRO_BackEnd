@@ -48,6 +48,8 @@ class BlotterController extends Controller
 
         $non_resident_address = $request->non_resident_address ?? null;
 
+        $remarks = !$request->remarks || $request->remarks == '' ? null : $request->remarks;
+
         DB::table('blotter_reports')
             ->insert([
                 'complainee_name' => $complainee_name,
@@ -65,6 +67,7 @@ class BlotterController extends Controller
                 'complainant_phone_number' => $complainant_phone_number,
                 'complainee_phone_number' => $complainee_phone_number,
                 'non_resident_address' => $non_resident_address,
+                'remarks' => $remarks,
             ]);
         return response()->json([
             'msg' => 'A blotter report has been filed',
@@ -100,6 +103,8 @@ class BlotterController extends Controller
 
         $non_resident_address = $request->non_resident_address ?? null;
 
+        $remarks = !$request->remarks || $request->remarks == '' ? null : $request->remarks;
+
         DB::table('blotter_reports')
             ->where('id','=',$blotter_id)
             ->update([
@@ -116,6 +121,7 @@ class BlotterController extends Controller
                 'complainant_phone_number' => $complainant_phone_number,
                 'complainee_phone_number' => $complainee_phone_number,
                 'non_resident_address' => $non_resident_address,
+                'remarks' => $remarks,
             ]);
             /*
         if($request->base64_file)
@@ -234,6 +240,7 @@ class BlotterController extends Controller
             br.complainee_phone_number,
             br.non_resident_address,
             br.category,
+            br.remarks,
             CONCAT(au.first_name, (CASE WHEN au.middle_name = '' THEN '' ELSE ' ' END), au.middle_name, ' ', au.last_name) as admin_name,
             br.officer_on_duty,
             CASE WHEN br.complainee_id IS NULL THEN 0 ELSE 1 END as is_complainee_resident,
