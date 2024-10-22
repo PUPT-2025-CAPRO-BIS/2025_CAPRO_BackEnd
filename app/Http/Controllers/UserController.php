@@ -75,9 +75,6 @@ class UserController extends Controller
         ];
 
         // Add conditional fields
-        if (!is_null($request->current_address)) {
-            $insertData['current_address'] = $request->current_address;
-        }
         if (!is_null($request->voter_status)) {
             $insertData['voter_status'] = $request->voter_status;
         }
@@ -160,7 +157,6 @@ class UserController extends Controller
                 'cell_number' => $request->cell_number,
                 'civil_status_id' => $request->civil_status_id,
                 'male_female' => $request->male_female,
-                'current_address' => $request->current_address,
                 'voter_status' => $request->voter_status,
                 'block' => $request->block,             
                 'lot' => $request->lot,                 
@@ -456,7 +452,6 @@ class UserController extends Controller
         u.birthday,
         u.cell_number,
         u.voter_status,
-        u.current_address,
         (
             SELECT
             CONCAT(
@@ -561,7 +556,6 @@ class UserController extends Controller
         $update_string .= !is_null($request->cell_number) ? "cell_number = '$request->cell_number'," : '';
         $update_string .= !is_null($request->civil_status_id) ? "civil_status_id = '$request->civil_status_id'," : '';
         $update_string .= !is_null($request->male_female) ? "male_female = '$request->male_female'," : '';
-        $update_string .= !is_null($request->current_address) ? "current_address = '$request->current_address'," : '';
         $update_string .= !is_null($request->voter_status) ? "voter_status = '$request->voter_status'," : '';
         $update_string .= !is_null($request->block) ? "block = '$request->block'," : '';
         $update_string .= !is_null($request->lot) ? "lot = '$request->lot'," : '';
