@@ -16,7 +16,7 @@ class NewResidentController extends Controller
     {
         $user_id = session("UserId");
         /*
-        $item_per_page = $request->item_per_page;
+        $item_per_page = $request->item_per_page;   
         $page_number = $request->page_number;
 
         $offset = $item_per_page * ($page_number - 1);
