@@ -13,27 +13,67 @@ class AppointmentController extends Controller
     {
         $status = $request->approve_reject == 0 ? 'Approved' : 'Rejected';
         $appointment = DB::table('appointments')
-        ->where('id','=',$request->appointment_id)
-        ->get();
-        if(count($appointment) < 1)
-        {
+            ->where('id', '=', $request->appointment_id)
+            ->first();
+
+        if (!$appointment) {
             return response()->json([
                 'error_msg' => 'Appointment does not exist',
                 'success' => false,
                 'error' => true
-            ],200);
+            ], 200);
         }
+
         DB::table('appointments')
-            ->where('id','=',$request->appointment_id)
+            ->where('id', '=', $request->appointment_id)
             ->update([
                 'status' => $status
             ]);
-        $status_string = $request->approve_reject  == 0 ? 'Approved' : 'Rejected';
-        createAuditLog(session('UserId'), 'Appointment ' . $status_string ,$request->appointment_id,strtolower($status_string));
+
+        // Ensure payment_status is not null
+        $payment_status = $appointment->payment_status ? $appointment->payment_status : 'Unpaid';
+
         return response()->json([
             'msg' => "Appointment Has Been $status",
-            'success' => true 
-        ],200);
+            'status' => $status,
+            'payment_status' => $payment_status, // Return the payment status with default 'Unpaid' if null
+            'success' => true
+        ], 200);
+    }
+    public function markAsPaid(Request $request)
+    {
+        // Fetch the appointment by ID
+        $appointment = DB::table('appointments')
+            ->where('id', '=', $request->appointment_id)
+            ->first(); // Changed to first() to fetch only one record
+
+        // Check if the appointment exists
+        if (!$appointment) {
+            return response()->json([
+                'error_msg' => 'Appointment does not exist',
+                'success' => false,
+                'error' => true
+            ], 200);
+        }
+
+        // Update the payment_status to 'Paid'
+        DB::table('appointments')
+            ->where('id', '=', $request->appointment_id)
+            ->update([
+                'payment_status' => 'Paid', // Set the status to 'Paid'
+                'updated_at' => now() // Update the timestamp
+            ]);
+
+        // Create an audit log for the action
+        createAuditLog(session('UserId'), 'Appointment marked as Paid', $request->appointment_id, 'paid');
+
+        // Respond with success and return the updated status and payment_status
+        return response()->json([
+            'msg' => 'Appointment has been marked as Paid',
+            'payment_status' => 'Paid',  // Returning updated payment_status
+            'status' => $appointment->status, // Return the status if needed
+            'success' => true
+        ], 200);
     }
     public function downloadAndReleaseDocument(Request $request)
     {
