@@ -77,6 +77,7 @@ Route::middleware(['AuthUser:2-3'])->group(function () {
     Route::post('importExcelResidents', [NewResidentController::class, 'importExcelResidents']);
     Route::post('approveOrRejectAppointment', [AppointmentController::class, 'approveOrRejectAppointment']);
     Route::post('noVerificationRegistration', [UserController::class, 'noVerificationRegistration']); //addbearer
+    Route::post('markAsPaid', [AppointmentController::class, 'markAsPaid']);
     Route::get('viewAdminLogs', [AdminController::class, 'viewAdminLogs']);
 });
     Route::get('testEmail', [UserController::class, 'testEmail']);

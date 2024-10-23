@@ -273,6 +273,7 @@ class AdminController extends Controller
                 apt.status,
                 apt.otp_used,
                 apt.purpose,
+                apt.payment_status,
                 apt.created_at as request_date,
                 doc_type.price,
                 CASE WHEN apt.updated_at IS NULL THEN '' ELSE apt.updated_at END as release_date,
