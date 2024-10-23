@@ -216,13 +216,14 @@ class HistoryController extends Controller
                     THEN CONCAT(ceu.first_name, ' ', ceu.middle_name, ' ', ceu.last_name) 
                     ELSE br.complainee_name 
                 END AS Complainee,
-                br.complaint_remarks AS Remarks,
+                br.complaint_remarks AS Naration,
                 CASE 
                     WHEN br.status_resolved = 0 THEN 'Ongoing'
                     WHEN br.status_resolved = 1 THEN 'Settled'
                     WHEN br.status_resolved = 2 THEN 'Unresolved'
                     WHEN br.status_resolved = 3 THEN 'Dismissed'
                 END AS Status,
+                br.remarks AS Remarks,
                 br.created_at AS 'Requested On',
                 CASE 
                     WHEN br.complainant_name IS NULL 
