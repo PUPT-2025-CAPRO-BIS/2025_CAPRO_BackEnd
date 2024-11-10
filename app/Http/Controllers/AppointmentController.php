@@ -115,6 +115,31 @@ class AppointmentController extends Controller
         
         // Fetch civil_status_id directly and use it to determine the civil status
         $civil_status_id = $user_deets->civil_status_id;
+        $gender = $user_deets->male_female;
+    
+        // Determine honorific (Mr., Ms., Mrs., etc.)
+        $honorifics = '';
+        if ($gender === 0) { // Male
+            $honorifics = 'Mr.';
+        } elseif ($gender === 1) { // Female
+            // For civil status, check if married (use 'Mrs.') or not (use 'Ms.')
+            if ($civil_status_id == 2) { // Married
+                $honorifics = 'Mrs.';
+            } else { // Single, Widowed, Separated
+                $honorifics = 'Ms.';
+            }
+        }
+    
+        // Determine gender pronoun (his/her)
+        $gender_pronoun = '';
+        if ($gender === 0) { // Male
+            $gender_pronoun = '<u>his</u>/her'; // Underline "his"
+        } elseif ($gender === 1) { // Female
+            $gender_pronoun = 'his/<u>her</u>'; // Underline "her"
+        }
+    
+        // Replace the gender pronoun in the description
+        $description = str_replace('$gender_pronoun', $gender_pronoun, $description);
     
         // Get today's date and add ordinal suffix directly to the day
         $currentDate = new DateTime();
@@ -167,7 +192,8 @@ class AppointmentController extends Controller
             }
         }
     
-        // Replace the full name
+        // Replace the full name with honorifics
+        $description = str_replace('$honorifics', $honorifics, $description);
         $description = str_replace('$name',
             $user_deets->first_name . ' ' .
             ($user_deets->middle_name == '' || is_null($user_deets->middle_name) ? '' : $user_deets->middle_name . ' ') .
@@ -236,4 +262,4 @@ class AppointmentController extends Controller
         // Return the generated PDF to the browser
         return $download == 1 ? $pdf->download('example.pdf') : $pdf->stream('example.pdf', ["Attachment" => false]);
     }
-}
+}    
