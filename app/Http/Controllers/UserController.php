@@ -498,14 +498,22 @@ class UserController extends Controller
                     )
                     ->where('user_id','=',$user->id)
                     ->get();
-                foreach($user->supporting_files_obj as $index => $file)
+                if($user->supporting_files_obj == null)
                 {
-                    $file->base64_file = $array[$index]->base64_file;
+                    $user->supporting_files_obj = [];
                 }
+                else
+                {
+                    foreach($user->supporting_files_obj as $index => $file)
+                    {
+                        $file->base64_file = $array[$index]->base64_file;
+                    }
+                }
+
             }
             else
             {
-                $user->supporting_files_obj = [];
+                
             }
         }
         $total_pages = DB::select("SELECT
