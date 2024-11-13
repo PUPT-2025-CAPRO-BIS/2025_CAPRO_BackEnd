@@ -49,8 +49,8 @@
         
         <div class="message">
             <p>Dear {{$first_name}},</p>
-            <p>Here is your OTP: {{$otp}}</p>
-            <p>Here is your email: {{$email_address}}</p>  
+            <p>Your OTP is: <strong>{{$otp}}</strong></p>
+            <p>Associated email: {{$email_address}}</p>
         </div>
         
     </div>

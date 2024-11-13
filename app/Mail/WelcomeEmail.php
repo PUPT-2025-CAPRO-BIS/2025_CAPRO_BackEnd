@@ -28,7 +28,7 @@ class WelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('lianpaulsantos@gmail.com', 'BIS-APP'),
+            from: new Address('bistaguig@gmail.com', 'BIS-Taguig'),
             subject: 'Welcome Email',
         );
     }
@@ -43,7 +43,6 @@ class WelcomeEmail extends Mailable
             with: [
                 'name' => $this->name,
             ],
-            cc: ['lianpaulsantos@gmail.com']
         );
     }
 

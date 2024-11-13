@@ -192,15 +192,16 @@ class UserController extends Controller
         ");
         $first_name = $request->first_name;
         $subject  = 'Your Resident Account Is Now Pending';
-        $content  = "Greetings $first_name, <br><br>";
-        $content .= "Your Resident Account is now pending. Please visit the barangay office with the hard copy of your uploaded document to have an admin approve your account.";
+        $content  = "Dear $first_name,<br><br>";
+        $content .= "We would like to inform you that your resident account is now pending approval. ";
+        $content .= "To complete the process, please visit the barangay office with a hard copy of your uploaded document for verification and approval.<br><br>";
+        $content .= "Thank you! <br><br>";
         DB::table('users')
             ->where('id','=',$request->user_id)
             ->update([
                 'isPendingResident' => 0
             ]);
         Mail::to($request->email)
-            ->cc(['bc00005rc@gmail.com'])
             ->send(new DynamicMail([
             'subject' => $subject,
             'content' => $content,
@@ -703,11 +704,11 @@ class UserController extends Controller
             VALUES
             ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute),1)
             ");
-            $subject  = 'Here is your change password OTP';
-            $content  = "Greetings $first_name, <br><br>";
-            $content .= "Your OTP to change your password is $otp . Please do not share this with anyone else.";
+            $subject = 'Your OTP to Change Password';
+            $content  = "Dear $first_name,<br><br>";
+            $content .= "We received a request to change your password. Your One-Time Password (OTP) is: <strong>$otp</strong>. <br><br>";
+            $content .= "For your security, do not share this OTP with anyone. <br><br>";
             Mail::to($user_details[0]->Email)
-                ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
                 'content' => $content,
@@ -754,7 +755,6 @@ class UserController extends Controller
         ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute))
         ");
         Mail::to($user_details[0]->Email)
-            ->cc('bc00005rc@gmail.com')
             ->send(new OTPEmail([
             'otp' => $otp,
             'email_address' => $request->email,
@@ -769,7 +769,7 @@ class UserController extends Controller
     }
     public function testEmail()
     {
-        Mail::to('bisappct@gmail.com')->send(new WelcomeEmail([
+        Mail::to('bistaguig@gmail.com')->send(new WelcomeEmail([
             'name' => 'Johnathan',
        ]));
     }
@@ -992,7 +992,6 @@ class UserController extends Controller
             ->where('id','=',$user_id)
             ->get();
         Mail::to($user_details[0]->email)
-            ->cc(['bc00005rc@gmail.com'])
             ->send(new CreatedAppointmentMail([
             'schedule_date' => $request->schedule_date,
             'email_address' => $user_details[0]->email,

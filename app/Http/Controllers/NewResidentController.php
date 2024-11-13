@@ -127,15 +127,16 @@ class NewResidentController extends Controller
             }
             $first_name = $user_details[0]->first_name;
             $subject  = 'Your Resident Account Has Been Approved';
-            $content  = "Greetings $first_name, <br><br>";
-            $content .= "Your resident request has been approved. You can now file for an appointment and request your needed document.";
+            $content  = "Dear $first_name,<br><br>";
+            $content .= "We are pleased to inform you that your resident account request has been approved. ";
+            $content .= "You may now schedule an appointment and request any necessary documents through our system.<br><br>";
+            $content .= "Thank you and congratulations!<br><br>";
             DB::table('users')
                 ->where('id','=',$request->user_id)
                 ->update([
                     'isPendingResident' => 0
                 ]);
             Mail::to($user_details[0]->email)
-                ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
                 'content' => $content,
@@ -161,8 +162,10 @@ class NewResidentController extends Controller
             }
             $first_name = $user_details[0]->first_name;
             $subject  = 'Your Resident Account Has Been Denied';
-            $content  = "Greetings $first_name, <br><br>";
-            $content .= "Your resident request has been denied. Please visit the barangay hall to resolve this.";
+            $content  = "Dear $first_name,<br><br>";
+            $content .= "We regret to inform you that your resident account request has been denied. ";
+            $content .= "To resolve this matter, please visit the barangay hall and bring any necessary documentation for further review.<br><br>";
+            $content .= "Thank you for your understanding.<br><br>";
             createAuditLog(session('UserId'),'New User Denied',$request->user_id,'denied');
             DB::table('users')
                 ->where('id','=',$request->user_id)
@@ -171,7 +174,6 @@ class NewResidentController extends Controller
                 ->where('user_id','=',$request->user_id)
                 ->delete();
             Mail::to($user_details[0]->email)
-                ->cc(['bc00005rc@gmail.com'])
                 ->send(new DynamicMail([
                 'subject' => $subject,
                 'content' => $content,
