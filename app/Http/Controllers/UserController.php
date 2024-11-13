@@ -904,7 +904,7 @@ class UserController extends Controller
             WHERE schedule_date = ?
         ", [$schedule_date]);
 
-        if ($count_schedules[0]->count >= 50) {
+        if ($count_schedules[0]->count >= 5) {
             return response()->json([
                 'error' => true,
                 'message' => 'The slots for your selected date are full. Please choose another date.'
@@ -948,7 +948,7 @@ class UserController extends Controller
         FROM appointments
         WHERE schedule_date = '$request->schedule_date'
         ");
-        if($count_schedules[0]->count >= 50)
+        if($count_schedules[0]->count >= 5)
         {
             return response()->json([
                 'error' => true,
