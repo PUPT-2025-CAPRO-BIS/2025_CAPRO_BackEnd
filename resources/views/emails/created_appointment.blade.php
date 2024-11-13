@@ -49,8 +49,9 @@
         
         <div class="message">
             <p>Dear {{$first_name}},</p>
-            <p>You have created an appointment scheduled for {{$schedule_date}} and your queuing number is {{$queuing_number}}.</p>
-            <p>Please make sure to arrive on time and prepare any relevant documents.</p>
+            <p>You have successfully scheduled an appointment for <strong>{{$schedule_date}}</strong>. Your assigned queuing number is <strong>{{$queuing_number}}</strong>.</p>
+            <p>Kindly ensure that you arrive on the scheduled date and have all relevant documentation prepared in advance.</p>
+            <p>Thank you!</p>
         </div>
         
     </div>

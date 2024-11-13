@@ -29,9 +29,8 @@ class DynamicMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('bisappct@gmail.com', 'BIS-APP'),
+            from: new Address('bistaguig@gmail.com', 'BIS-Taguig'),
             subject: $this->subject,
-            cc: ['bc00005rc@gmail.com'],
         );
     }
 
