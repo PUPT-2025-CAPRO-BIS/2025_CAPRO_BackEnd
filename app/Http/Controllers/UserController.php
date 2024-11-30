@@ -192,10 +192,10 @@ class UserController extends Controller
         ");
         $first_name = $request->first_name;
         $subject  = 'Your Resident Account Is Now Pending';
-        $content  = "Dear $first_name,<br><br>";
-        $content .= "We would like to inform you that your resident account is now pending approval. ";
-        $content .= "To complete the process, please visit the barangay office with a hard copy of your uploaded document for verification and approval.<br><br>";
-        $content .= "Thank you! <br><br>";
+        $content  = "Dear <strong>$first_name</strong>,<br><br>";
+        $content .= "We would like to inform you that your resident account is currently <strong>pending approval</strong>. ";
+        $content .= "Please be advised that your application will be evaluated, and you will be notified of your application status.<br><br>";
+        $content .= "Thank you for your understanding.";
         DB::table('users')
             ->where('id','=',$request->user_id)
             ->update([
@@ -705,9 +705,10 @@ class UserController extends Controller
             ('$otp','$user_id',1,date_add('$current_date_time',interval 5 minute),1)
             ");
             $subject = 'Your OTP to Change Password';
-            $content  = "Dear $first_name,<br><br>";
-            $content .= "We received a request to change your password. Your One-Time Password (OTP) is: <strong>$otp</strong>. <br><br>";
-            $content .= "For your security, do not share this OTP with anyone. <br><br>";
+            $content  = "Dear <strong>$first_name</strong>,<br><br>";
+            $content .= "We received a request to change your password. <br><br>";
+            $content .= "Your One-Time Password (OTP) is: <strong>$otp</strong>. <br><br>";
+            $content .= "For your security, do not share this OTP with anyone.";
             Mail::to($user_details[0]->Email)
                 ->send(new DynamicMail([
                 'subject' => $subject,
