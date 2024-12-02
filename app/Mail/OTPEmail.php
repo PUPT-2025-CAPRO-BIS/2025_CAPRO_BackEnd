@@ -33,7 +33,7 @@ class OTPEmail extends Mailable
     {
         return new Envelope(
             from: new Address('bistaguig@gmail.com', 'BIS-Taguig'),
-            subject: 'BIS OTP',
+            subject: 'OTP',
         );
     }
 

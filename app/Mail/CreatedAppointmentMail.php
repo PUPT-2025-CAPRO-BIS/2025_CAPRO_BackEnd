@@ -34,7 +34,7 @@ class CreatedAppointmentMail extends Mailable
     {
         return new Envelope(
             from: new Address('bistaguig@gmail.com', 'BIS-Taguig'),
-            subject: 'BIS Schedule Confirmation',
+            subject: 'Schedule Confirmation',
         );
     }
 
