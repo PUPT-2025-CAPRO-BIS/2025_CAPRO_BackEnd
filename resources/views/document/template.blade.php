@@ -252,6 +252,20 @@
 <div style="width: 100% ; display: flex; clear:both; position:relative;border-color">
     <div style="background-color: #058c61; width: 30%;position:absolute; left:0pt;top:0pt;bottom:0pt;padding-left:1%;min-height: 100%">
 
+      @php  
+        $officials = DB::table('barangay_officials')
+                        ->join('users', 'barangay_officials.user_id', '=', 'users.id')
+                        ->where('barangay_officials.status', 1)
+                        ->select(
+                            'barangay_officials.chairmanship',
+                            'barangay_officials.position',
+                            'users.first_name',
+                            'users.middle_name',
+                            'users.last_name'
+                        )
+                        ->get();
+        @endphp
+
         <div style="align-items:center;justify-content:center;margin-left:40px; margin-top: 20px;">
             <img
                 className='ms-5'
@@ -271,190 +285,20 @@
             </span>
         </div>
 
-        <div
-            style=" margin-top: 30px;justify-content: center;"
-        >
-            <span
-                style=" color:white;font-weight: bold; font-size: 12px" 
-            >
-                HON. RODOLFO E. TANGPUZ II </br>
-            </span>
-            <span
-                style=" color: white;font-size:12px"
-            >
-                BARANGAY CHAIRMAN
-            </span>
-        </div>
+        @foreach($officials as $official)
+          <div style="margin-top: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: 15px;">
+              <span style="color: white; font-weight: bold; font-size: 12px;">
+                  {{ strtoupper($official->first_name) }} {{ strtoupper($official->middle_name) }} {{ strtoupper($official->last_name) }} <br>
+              </span>
+              <div style="color: white; font-size: 12px;">
+                {{ strtoupper($official->position) }}
+              </div>
+              <div style="color: white; font-size: 12px;">
+                  {{ strtoupper($official->chairmanship) }}
+              </div>
+          </div>
+        @endforeach
 
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. MARIA CECILIA T. BALMORI </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR CULTURAL & SPORT
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. VENADIK M. CASTRO </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR PEACE & ORDER
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. LEAH M. PEREZ </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR APPROPRIATION,
-                EDUCATION & INFORMATION
-                DISSEMINATION
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. CRISTINA O. SANARES  </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR ELDERLY & PDAO, FAMILY AFFAIRS
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. OLIVER G. OSANO </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR TRANSPORTATION
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. PIULY B. DULANG </br>
-            </span>
-            <div
-                style=" color: white;font-size:12px"
-            >
-                KAGAWAD
-            </div>
-            <div
-                style=" color: white;font-size:10px"
-            >
-                CHAIRMAN FOR HEALTH & ENVIRONMENT SANITATION
-            </div>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                HON. ALYNN REIGN A. RAFIÑAN </br>
-            </span>
-            <span
-                style=" color: white;font-size:12px"
-            >
-                SK CHAIRPERSON
-            </span>
-        </div>
-
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                OLGA H. CALAYO </br>
-            </span>
-            <span
-                style=" color: white;font-size:12px"
-            >
-                BARANGAY SECRETARY
-            </span>
-        </div>
-
-        <div
-            style=" margin-top: 20px; display: flex; flex-direction: column; justify-content: center; marginLeft: 15px"
-        >
-            <span
-                style=" color:white;font-weight: bold;font-size: 12px" 
-            >
-                LILIA T. AMADOR </br>
-            </span>
-            <span
-                style=" color: white;font-size:12px"
-            >
-                BARANGAY TREASURER
-            </span>
-        </div>
-
-        
         <div
             style="position: absolute; bottom: 40; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-left: 0; padding-bottom: 20px; font-family: 'Arial', sans-serif;"
         >
@@ -526,12 +370,27 @@
             <div className='flex-column d-flex align-items-end pe-5'
                 style="flex-direction: column; display: flex; align-items: center; padding-right: 50px; clear: both; position: relative;"
             >
-                <span    style="font-weight:bold;position:absolute; right:20pt; top: 40px;">
-                    HON. RODOLFO E. TANGPUZ II
+            @php
+              $chairman = DB::table('barangay_officials')
+                              ->join('users', 'barangay_officials.user_id', '=', 'users.id')
+                              ->where('barangay_officials.position', 'Barangay Chairman')
+                              ->where('barangay_officials.status', 1)
+                              ->select(
+                                  'users.first_name',
+                                  'users.middle_name',
+                                  'users.last_name'
+                              )
+                              ->first();
+            @endphp
+
+              @if($chairman)
+                <span style="font-weight:bold;position:absolute; right:20pt; top: 40px;">
+                  HON. {{ strtoupper($chairman->first_name) }} {{ strtoupper($chairman->middle_name) }} {{ strtoupper($chairman->last_name) }}
                 </span>
                 <span style="font-style: italic;position:absolute; right:20pt; top: 70px;">
-                    Barangay Chairman
+                  Barangay Chairman
                 </span>
+                @endif
             </div>
         </div>
 
