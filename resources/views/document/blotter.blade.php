@@ -214,7 +214,7 @@
         <table class="header-table">
             <tr>
                 <td style="width: 25%;">
-                    <img src="https://000040122.xyz/images/central.png" alt="Barangay Central Bicutan Logo">
+                    <img src="https://000040122.xyz/images/central_logo.png" alt="Barangay Central Bicutan Logo">
                 </td>
                 <td style="width: 50%;">
                     <div class="title">
@@ -272,7 +272,7 @@
     </div>
 
     <div class="section">
-        <div class="section-title">Pangalan ng Inirereklamo (Complainee's Name):</div>
+        <div class="section-title">Pangalan ng Inirereklamo (Respondent's Name):</div>
         <div class="section-content">
             <span class="field-label">Complainee:</span>
             <span class="field-value">{{ $complainee_name }}</span>
@@ -280,7 +280,7 @@
     </div>
 
     <div class="section">
-        <div class="section-title">Telepono ng Inirereklamo (Complainee's Phone):</div>
+        <div class="section-title">Telepono ng Inirereklamo (Respondent's Phone):</div>
         <div class="section-content">
             <span class="field-label">Phone:</span>
             <span class="field-value">{{ $complainee_phone }}</span>
@@ -288,7 +288,7 @@
     </div>
 
     <div class="section">
-        <div class="section-title">Tirahan ng Inirereklamo (Complainee's Address):</div>
+        <div class="section-title">Tirahan ng Inirereklamo (Respondent's Address):</div>
         <div class="section-content">
             <span class="field-label">Address:</span>
             <span class="field-value">{{ $complainee_address }}</span>

@@ -273,7 +273,7 @@
                     height: 150px;
                     width: 150px
                 "
-                src='./images/central.png'
+                src='./images/central_logo.png'
             />
         </div>
 
@@ -286,21 +286,21 @@
         </div>
 
         @foreach($officials as $official)
-          <div style="margin-top: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: 15px;">
+          <div style="margin-top: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: 12px;">
               <span style="color: white; font-weight: bold; font-size: 12px;">
                   {{ strtoupper($official->first_name) }} {{ strtoupper($official->middle_name) }} {{ strtoupper($official->last_name) }} <br>
               </span>
               <div style="color: white; font-size: 12px;">
-                {{ strtoupper($official->position) }}
+                  {{ strtoupper($official->chairmanship) }}
               </div>
               <div style="color: white; font-size: 12px;">
-                  {{ strtoupper($official->chairmanship) }}
+                {{ strtoupper($official->position) }}
               </div>
           </div>
         @endforeach
 
         <div
-            style="position: absolute; bottom: 40; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-left: 0; padding-bottom: 20px; font-family: 'Arial', sans-serif;"
+            style="position: absolute; bottom: 40; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-left: -5; padding-bottom: 20px; font-family: 'Arial', sans-serif;"
         >
             <span style="color: white; font-weight: bold; font-size: 20px; line-height: 1.5;">
                 Serbisyong Tapat
@@ -364,7 +364,7 @@
                     {!! $title !!}
                 </h4>
             </div>
-            <div id='document-body' style=" height: 520px ;position: relative;left:0pt;width:92%;text-align:left;padding-left:25px;padding-right:15px; font-size: 15px;">
+            <div id='document-body' style="height: 500px; position: relative; width: 86%; margin: -20px auto 20px 15px; padding: 20px; text-align: justify; font-size: 15px;">
                 {!! $html_code !!}
             </div>
             <div className='flex-column d-flex align-items-end pe-5'
@@ -384,10 +384,10 @@
             @endphp
 
               @if($chairman)
-                <span style="font-weight:bold;position:absolute; right:20pt; top: 40px;">
+                <span style="font-weight:bold;position:absolute; right:32pt; top: 40px;">
                   HON. {{ strtoupper($chairman->first_name) }} {{ strtoupper($chairman->middle_name) }} {{ strtoupper($chairman->last_name) }}
                 </span>
-                <span style="font-style: italic;position:absolute; right:20pt; top: 70px;">
+                <span style="font-style: italic;position:absolute; right:32pt; top: 70px;">
                   Barangay Chairman
                 </span>
                 @endif
