@@ -75,7 +75,7 @@
 
         <div class="header">
             <img src="https://000040122.xyz/images/taguig.png" alt="Taguig Logo">
-            <img src="http://000040122.xyz/images/central.png" alt="Central Logo">
+            <img src="http://000040122.xyz/images/central_logo.png" alt="Central Logo">
             <h2>Barangay Central Bicutan</h2>
         </div>
 
