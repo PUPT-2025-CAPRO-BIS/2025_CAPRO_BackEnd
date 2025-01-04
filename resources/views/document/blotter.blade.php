@@ -214,7 +214,7 @@
         <table class="header-table">
             <tr>
                 <td style="width: 25%;">
-                    <img src="https://000040122.xyz/images/central.png" alt="Barangay Central Bicutan Logo">
+                    <img src="https://000040122.xyz/images/central_logo.png" alt="Barangay Central Bicutan Logo">
                 </td>
                 <td style="width: 50%;">
                     <div class="title">

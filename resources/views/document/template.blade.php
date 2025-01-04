@@ -273,7 +273,7 @@
                     height: 150px;
                     width: 150px
                 "
-                src='./images/central.png'
+                src='./images/central_logo.png'
             />
         </div>
 
