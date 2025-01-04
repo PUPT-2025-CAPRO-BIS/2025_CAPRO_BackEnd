@@ -905,12 +905,17 @@ class UserController extends Controller
         FROM appointments
         WHERE schedule_date = '$request->schedule_date'
         ");
-    if ($count_schedules[0]->count >= 5) {
-      return response()->json([
-        'error' => true,
-        'error_msg' => 'The slots for your selected date are full. Please select another date.',
-        'success' => false
-      ], 200);
+
+    $slot_limit = DB::table('configurations')
+        ->where('key_name', 'max_appointments_per_day')
+        ->value('key_value') ?? 5; // Default to 5 if not set
+
+    if ($count_schedules[0]->count >= $slot_limit) {
+        return response()->json([
+            'error' => true,
+            'error_msg' => "The slots for your selected date are full. Please select another date.",
+            'success' => false
+        ], 200);
     }
     //$file = $request->file('file_upload');
 
@@ -961,6 +966,23 @@ class UserController extends Controller
       'msg' => 'Appointment made',
       'success' => true
     ]);
+  }
+
+  function updateSlotLimit(Request $request)
+  {
+      $request->validate([
+          'slot_limit' => 'required|integer|min:1|max:200', // Validate input
+      ]);
+
+      DB::table('configurations')->updateOrInsert(
+          ['key_name' => 'max_appointments_per_day'], // Update if exists, insert otherwise
+          ['key_value' => $request->slot_limit, 'updated_at' => now()]
+      );
+
+      return response()->json([
+          'success' => true,
+          'message' => 'Slot limit updated successfully',
+      ]);
   }
 
   function updateEmail(Request $request)

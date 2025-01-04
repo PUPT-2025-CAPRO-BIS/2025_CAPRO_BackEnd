@@ -46,6 +46,7 @@ Route::post('adminLogin', [UserController::class, 'adminLogin']);
 Route::post('generateOTP', [UserController::class, 'generateOTP']);
 Route::post('otpLogin', [UserController::class, 'otpLogin']);
 Route::post('otpChangePassword', [UserController::class, 'otpChangePassword']);
+Route::post('/updateSlotLimit', [UserController::class, 'updateSlotLimit']);
 
 Route::middleware(['AuthUser:3'])->group(function () {
   Route::get('viewAdminableUsers', [AdminController::class, 'viewAdminableUsers']);
