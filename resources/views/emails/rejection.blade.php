@@ -84,7 +84,7 @@
 
         <div class="message">
             <p>Dear <strong>{{ $appointment->first_name }} {{ $appointment->last_name }}</strong>,</p>
-            <p>We regret to inform you that your appointment scheduled for <strong>{{ $appointment->schedule_date }}</strong> has been rejected.</p>
+            <p>We regret to inform you that your appointment scheduled for <strong>{{ \Carbon\Carbon::parse($appointment->schedule_date)->format('Y-m-d') }}</strong> has been rejected.</p>
             <p><strong>Rejection Reason:</strong> {{ $reason }}</p>
             <p>We apologize for any inconvenience caused. If you have any further questions, please contact support.</p>
             <p>Thank you for understanding.</p>

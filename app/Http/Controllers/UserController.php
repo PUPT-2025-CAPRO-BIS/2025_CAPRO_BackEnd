@@ -437,6 +437,7 @@ class UserController extends Controller
         u.birthday,
         u.cell_number,
         u.voter_status,
+        u.id_type,
         (
             SELECT
             CONCAT(
