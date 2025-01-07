@@ -167,6 +167,7 @@ class UserController extends Controller
         'relationship_to_owner' => $request->relationship_to_owner,
         'pet_details' => $request->pet_details,
         'pet_vaccination' => $request->pet_vaccination,
+        'id_type' => $request->id_type,
         'isPendingResident' => '1'
       ]);
     foreach ($request->file_upload as $file) {
@@ -191,7 +192,7 @@ class UserController extends Controller
     $first_name = $request->first_name;
     $subject  = 'Your Resident Account Is Now Pending';
     $content  = "Dear <strong>$first_name</strong>,<br><br>";
-    $content .= "We would like to inform you that your resident account is currently <strong>pending approval</strong>. ";
+    $content .= "We would like to inform you that your resident information is currently <strong>pending approval</strong>. ";
     $content .= "Please be advised that your application will be evaluated, and you will be notified of your application status.<br><br>";
     $content .= "Thank you for your understanding.";
     DB::table('users')

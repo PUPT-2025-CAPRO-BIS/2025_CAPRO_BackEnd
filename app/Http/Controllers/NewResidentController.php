@@ -128,7 +128,7 @@ class NewResidentController extends Controller
             $first_name = $user_details[0]->first_name;
             $subject  = 'Your Resident Account Has Been Approved';
             $content  = "Dear <strong>$first_name</strong>,<br><br>";
-            $content .= "We are pleased to inform you that your resident account request <strong>has been approved. </strong>";
+            $content .= "We are pleased to inform you that your resident information <strong>has been approved. </strong>";
             $content .= "You may now schedule an appointment and request any necessary documents through our system.<br><br>";
             $content .= "Thank you and congratulations!";
             DB::table('users')
@@ -163,7 +163,7 @@ class NewResidentController extends Controller
             $first_name = $user_details[0]->first_name;
             $subject  = 'Your Resident Account Has Been Denied';
             $content  = "Dear <strong>$first_name</strong>,<br><br>";
-            $content .= "We regret to inform you that your resident account request <strong>has been denied. </strong>";
+            $content .= "We regret to inform you that your resident information <strong>has been denied. </strong>";
             $content .= "To resolve this matter, please visit the barangay hall and bring any necessary documentation for further review.<br><br>";
             $content .= "Thank you for your understanding.";
             createAuditLog(session('UserId'),'New User Denied',$request->user_id,'denied');
