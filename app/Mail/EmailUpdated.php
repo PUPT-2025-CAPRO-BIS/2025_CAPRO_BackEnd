@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
 
 class EmailUpdated extends Mailable
 {
@@ -31,6 +32,7 @@ class EmailUpdated extends Mailable
   public function envelope(): Envelope
   {
     return new Envelope(
+      from: new Address('bistaguig@gmail.com', 'BIS-Taguig'),
       subject: 'Email Updated',
     );
   }
