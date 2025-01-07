@@ -6,16 +6,22 @@ use Illuminate\Http\Request;
 use DB;
 use DateTime;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RejectionEmail;
 require_once app_path('Helpers/helpers.php');
 class AppointmentController extends Controller
 {
     public function approveOrRejectAppointment(Request $request)
     {
         $status = $request->approve_reject == 0 ? 'Approved' : 'Rejected';
+    
+        // Join appointments table with users table to fetch user details along with appointment data
         $appointment = DB::table('appointments')
-            ->where('id', '=', $request->appointment_id)
+            ->join('users', 'appointments.user_id', '=', 'users.id')
+            ->where('appointments.id', '=', $request->appointment_id)
+            ->select('appointments.*', 'users.first_name', 'users.last_name', 'users.email')
             ->first();
-
+    
         if (!$appointment) {
             return response()->json([
                 'error_msg' => 'Appointment does not exist',
@@ -23,23 +29,31 @@ class AppointmentController extends Controller
                 'error' => true
             ], 200);
         }
-
+    
+        // Update the appointment status and rejection reason
         DB::table('appointments')
             ->where('id', '=', $request->appointment_id)
             ->update([
-                'status' => $status
+                'status' => $status,
+                'rejection_reason' => $request->reason,
             ]);
-
+    
+        // Send email if the status is Rejected
+        if ($status === 'Rejected' && $appointment->email) {
+            // Send the rejection email to the user
+            Mail::to($appointment->email)->send(new RejectionEmail($appointment, $request->reason));
+        }
+    
         // Ensure payment_status is not null
         $payment_status = $appointment->payment_status ? $appointment->payment_status : 'Unpaid';
-
+    
         return response()->json([
             'msg' => "Appointment Has Been $status",
             'status' => $status,
             'payment_status' => $payment_status, // Return the payment status with default 'Unpaid' if null
             'success' => true
         ], 200);
-    }
+    }  
     public function markAsPaid(Request $request)
     {
         // Fetch the appointment by ID
