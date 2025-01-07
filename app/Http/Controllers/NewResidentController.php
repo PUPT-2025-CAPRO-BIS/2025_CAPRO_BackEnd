@@ -113,6 +113,8 @@ class NewResidentController extends Controller
     public function editNewResidentStatus(Request $request)
     {
         $approve_reject = $request->approve_reject;
+        $reason = $request->reason;
+
         if($approve_reject == 0)
         {
             $user_details = DB::table('users')
@@ -164,6 +166,11 @@ class NewResidentController extends Controller
             $subject  = 'Your Resident Account Has Been Denied';
             $content  = "Dear <strong>$first_name</strong>,<br><br>";
             $content .= "We regret to inform you that your resident information <strong>has been denied. </strong>";
+
+            if ($reason) {
+              $content .= "<br><br><strong>Reason for Rejection:</strong><br>$reason<br><br>";
+            }
+
             $content .= "To resolve this matter, please visit the barangay hall and bring any necessary documentation for further review.<br><br>";
             $content .= "Thank you for your understanding.";
             createAuditLog(session('UserId'),'New User Denied',$request->user_id,'denied');
