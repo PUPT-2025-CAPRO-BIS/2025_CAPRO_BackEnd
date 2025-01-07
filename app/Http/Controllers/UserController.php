@@ -696,17 +696,17 @@ class UserController extends Controller
       ->whereRaw("status_resolved IN ('0','2')")
       ->whereRaw("complainee_id = '$user_id'")
       ->get();
-    if (count($blotter_info) > 0) {
-      $category = $blotter_info->first()->category;
-      $status_resolved = $blotter_info->first()->status_resolved;
+    // if (count($blotter_info) > 0) {
+    //   $category = $blotter_info->first()->category;
+    //   $status_resolved = $blotter_info->first()->status_resolved;
 
-      $status_text = $status_resolved == '0' ? 'ongoing' : ($status_resolved == '2' ? 'unresolved' : 'unknown');
+    //   $status_text = $status_resolved == '0' ? 'ongoing' : ($status_resolved == '2' ? 'unresolved' : 'unknown');
 
-      return response()->json([
-        'error' => true,
-        'error_msg' => 'There is ' . $status_text . ' blotter report with your name in the following category: ' . $category . '. Please go to the barangay to resolve this.'
-      ]);
-    }
+    //   return response()->json([
+    //     'error' => true,
+    //     'error_msg' => 'There is ' . $status_text . ' blotter report with your name in the following category: ' . $category . '. Please go to the barangay to resolve this.'
+    //   ]);
+    // }
     if ($user_details[0]->isPendingResident == '1') {
       return response()->json([
         'error' => true,
@@ -907,15 +907,15 @@ class UserController extends Controller
         ");
 
     $slot_limit = DB::table('configurations')
-        ->where('key_name', 'max_appointments_per_day')
-        ->value('key_value') ?? 5; // Default to 5 if not set
+      ->where('key_name', 'max_appointments_per_day')
+      ->value('key_value') ?? 5; // Default to 5 if not set
 
     if ($count_schedules[0]->count >= $slot_limit) {
-        return response()->json([
-            'error' => true,
-            'error_msg' => "The slots for your selected date are full. Please select another date.",
-            'success' => false
-        ], 200);
+      return response()->json([
+        'error' => true,
+        'error_msg' => "The slots for your selected date are full. Please select another date.",
+        'success' => false
+      ], 200);
     }
     //$file = $request->file('file_upload');
 
@@ -970,19 +970,19 @@ class UserController extends Controller
 
   function updateSlotLimit(Request $request)
   {
-      $request->validate([
-          'slot_limit' => 'required|integer|min:1|max:200', // Validate input
-      ]);
+    $request->validate([
+      'slot_limit' => 'required|integer|min:1|max:200', // Validate input
+    ]);
 
-      DB::table('configurations')->updateOrInsert(
-          ['key_name' => 'max_appointments_per_day'], // Update if exists, insert otherwise
-          ['key_value' => $request->slot_limit, 'updated_at' => now()]
-      );
+    DB::table('configurations')->updateOrInsert(
+      ['key_name' => 'max_appointments_per_day'], // Update if exists, insert otherwise
+      ['key_value' => $request->slot_limit, 'updated_at' => now()]
+    );
 
-      return response()->json([
-          'success' => true,
-          'message' => 'Slot limit updated successfully',
-      ]);
+    return response()->json([
+      'success' => true,
+      'message' => 'Slot limit updated successfully',
+    ]);
   }
 
   function updateEmail(Request $request)
