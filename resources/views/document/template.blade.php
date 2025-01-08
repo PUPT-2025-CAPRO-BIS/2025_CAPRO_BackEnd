@@ -290,10 +290,10 @@
               <span style="color: white; font-weight: bold; font-size: 12px;">
                   {{ strtoupper($official->first_name) }} {{ strtoupper($official->middle_name) }} {{ strtoupper($official->last_name) }} <br>
               </span>
-              <div style="color: white; font-size: 12px;">
+              <div style="color: white; font-size: 10px;">
                   {{ strtoupper($official->chairmanship) }}
               </div>
-              <div style="color: white; font-size: 12px;">
+              <div style="color: white; font-size: 10px;">
                 {{ strtoupper($official->position) }}
               </div>
           </div>
