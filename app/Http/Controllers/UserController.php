@@ -147,7 +147,7 @@ class UserController extends Controller
     $user_id = DB::table('users')
       ->insertGetId([
         'first_name' => $request->first_name,
-        'middle_name' => $request->middle_name,
+        'middle_name' => $request->middle_name ?? null,
         'last_name' => $request->last_name,
         'email' => $request->email,
         'email_verified_at' => NULL,
