@@ -992,6 +992,19 @@ class UserController extends Controller
     ]);
   }
 
+  function getSlotLimit()
+  {
+    // Fetch the slot limit from the configurations table, default to 5 if not set
+    $slot_limit = DB::table('configurations')
+        ->where('key_name', 'max_appointments_per_day')
+        ->value('key_value') ?? 5;
+
+    return response()->json([
+        'success' => true,
+        'slot_limit' => (int) $slot_limit,
+    ]);
+  }
+
   function updateEmail(Request $request)
   {
     // Validate incoming data

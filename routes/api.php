@@ -92,3 +92,4 @@ Route::get('downloadPendingResidents', [HistoryController::class, 'downloadPendi
 Route::get('downloadAndReleaseDocument', [AppointmentController::class, 'downloadAndReleaseDocument']);
 Route::get('downloadBlotterPDF', [BlotterController::class, 'downloadBlotterPDF']);
 Route::post('/updateEmail', [UserController::class, 'updateEmail']);
+Route::get('/getSlotLimit', [UserController::class, 'getSlotLimit']);
